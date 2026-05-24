@@ -1,0 +1,1871 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cat.1 bis 芯片与模组竞品分析报告</title>
+<style>
+/* ========== 全局变量与重置 ========== */
+:root {
+  --bg-primary: #0a0e1a;
+  --bg-secondary: #111827;
+  --bg-card: #1a2035;
+  --bg-card-hover: #1f2a45;
+  --border-color: #2a3555;
+  --text-primary: #e8ecf4;
+  --text-secondary: #8892a8;
+  --text-muted: #5a6478;
+  --accent-cyan: #00d4ff;
+  --accent-cyan-dim: rgba(0,212,255,0.15);
+  --accent-orange: #ff8c42;
+  --accent-orange-dim: rgba(255,140,66,0.15);
+  --accent-green: #22c55e;
+  --accent-green-dim: rgba(34,197,94,0.15);
+  --accent-red: #ef4444;
+  --accent-red-dim: rgba(239,68,68,0.15);
+  --accent-purple: #a78bfa;
+  --accent-yellow: #fbbf24;
+  --nav-height: 60px;
+  --radius: 8px;
+  --shadow: 0 4px 24px rgba(0,0,0,0.3);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; scroll-padding-top: calc(var(--nav-height) + 16px); }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.7;
+  font-size: 15px;
+}
+a { color: var(--accent-cyan); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* ========== 导航栏 ========== */
+.navbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+  height: var(--nav-height);
+  background: rgba(10,14,26,0.92);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border-color);
+  display: flex; align-items: center; padding: 0 24px;
+}
+.nav-brand {
+  font-size: 16px; font-weight: 700; color: var(--accent-cyan);
+  white-space: nowrap; margin-right: 32px;
+  letter-spacing: 0.5px;
+}
+.nav-links { display: flex; gap: 4px; flex-wrap: nowrap; overflow-x: auto; }
+.nav-links a {
+  color: var(--text-secondary); font-size: 13px; padding: 6px 12px;
+  border-radius: 6px; white-space: nowrap; transition: all 0.2s;
+}
+.nav-links a:hover, .nav-links a.active {
+  color: var(--accent-cyan); background: var(--accent-cyan-dim);
+  text-decoration: none;
+}
+.nav-toggle { display: none; background: none; border: none; color: var(--text-primary); font-size: 24px; cursor: pointer; }
+
+/* ========== 封面 ========== */
+.cover {
+  min-height: 100vh; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; text-align: center;
+  padding: 80px 24px 60px;
+  background: radial-gradient(ellipse at 30% 20%, rgba(0,212,255,0.08) 0%, transparent 50%),
+              radial-gradient(ellipse at 70% 80%, rgba(255,140,66,0.06) 0%, transparent 50%),
+              var(--bg-primary);
+  position: relative; overflow: hidden;
+}
+.cover::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 60px, rgba(42,53,85,0.15) 60px, rgba(42,53,85,0.15) 61px),
+              repeating-linear-gradient(90deg, transparent, transparent 60px, rgba(42,53,85,0.15) 60px, rgba(42,53,85,0.15) 61px);
+  pointer-events: none;
+}
+.cover-content { position: relative; z-index: 1; max-width: 800px; }
+.cover-badge {
+  display: inline-block; padding: 6px 20px; border-radius: 20px;
+  background: var(--accent-cyan-dim); color: var(--accent-cyan);
+  font-size: 13px; font-weight: 600; margin-bottom: 24px;
+  border: 1px solid rgba(0,212,255,0.3);
+}
+.cover h1 {
+  font-size: clamp(28px, 5vw, 48px); font-weight: 800;
+  background: linear-gradient(135deg, var(--accent-cyan), #60a5fa, var(--accent-orange));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; margin-bottom: 16px; line-height: 1.3;
+}
+.cover .subtitle {
+  font-size: clamp(16px, 2.5vw, 22px); color: var(--text-secondary);
+  margin-bottom: 40px; font-weight: 400;
+}
+.cover-meta { display: flex; gap: 32px; justify-content: center; flex-wrap: wrap; margin-bottom: 48px; }
+.cover-meta-item { text-align: center; }
+.cover-meta-item .label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+.cover-meta-item .value { font-size: 20px; font-weight: 700; color: var(--accent-cyan); }
+.cover .disclaimer {
+  font-size: 12px; color: var(--text-muted); max-width: 600px;
+  margin: 0 auto; line-height: 1.6;
+}
+.cover-scroll {
+  position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%);
+  animation: bounce 2s infinite;
+}
+.cover-scroll span { display: block; width: 24px; height: 24px; border-right: 2px solid var(--accent-cyan); border-bottom: 2px solid var(--accent-cyan); transform: rotate(45deg); opacity: 0.5; }
+@keyframes bounce { 0%,100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(10px); } }
+
+/* ========== 通用布局 ========== */
+.container { max-width: 1280px; margin: 0 auto; padding: 0 24px; }
+.section { padding: 80px 0; }
+.section-header { margin-bottom: 48px; }
+.section-header h2 {
+  font-size: 28px; font-weight: 700; margin-bottom: 8px;
+  display: flex; align-items: center; gap: 12px;
+}
+.section-header h2 .num {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 40px; height: 40px; border-radius: 10px;
+  background: linear-gradient(135deg, var(--accent-cyan), #3b82f6);
+  color: #fff; font-size: 18px; font-weight: 800; flex-shrink: 0;
+}
+.section-header p { color: var(--text-secondary); font-size: 16px; margin-top: 8px; }
+
+/* ========== 折叠面板 ========== */
+.collapse-panel { margin-bottom: 16px; border: 1px solid var(--border-color); border-radius: var(--radius); overflow: hidden; }
+.collapse-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px; cursor: pointer; user-select: none;
+  background: var(--bg-card); transition: background 0.2s;
+}
+.collapse-header:hover { background: var(--bg-card-hover); }
+.collapse-header h3 { font-size: 17px; font-weight: 600; }
+.collapse-header .arrow {
+  width: 20px; height: 20px; transition: transform 0.3s;
+  border-right: 2px solid var(--text-secondary); border-bottom: 2px solid var(--text-secondary);
+  transform: rotate(45deg);
+}
+.collapse-header.open .arrow { transform: rotate(-135deg); }
+.collapse-body { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
+.collapse-body.open { max-height: none; }
+.collapse-body-inner { padding: 20px; }
+
+/* ========== 卡片 ========== */
+.card {
+  background: var(--bg-card); border: 1px solid var(--border-color);
+  border-radius: var(--radius); padding: 24px; transition: all 0.2s;
+}
+.card:hover { border-color: rgba(0,212,255,0.3); box-shadow: 0 0 20px rgba(0,212,255,0.05); }
+.card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+.card-grid-3 { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+
+/* ========== 统计卡片 ========== */
+.stat-card { text-align: center; padding: 28px 20px; }
+.stat-card .stat-value { font-size: 36px; font-weight: 800; margin-bottom: 4px; }
+.stat-card .stat-value.cyan { color: var(--accent-cyan); }
+.stat-card .stat-value.orange { color: var(--accent-orange); }
+.stat-card .stat-value.green { color: var(--accent-green); }
+.stat-card .stat-value.purple { color: var(--accent-purple); }
+.stat-card .stat-label { font-size: 13px; color: var(--text-secondary); }
+.stat-card .stat-change { font-size: 12px; margin-top: 8px; }
+.stat-card .stat-change.up { color: var(--accent-green); }
+.stat-card .stat-change.down { color: var(--accent-red); }
+
+/* ========== 表格 ========== */
+.table-wrapper { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--border-color); }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+thead { background: rgba(0,212,255,0.08); }
+th {
+  padding: 12px 14px; text-align: left; font-weight: 600; color: var(--accent-cyan);
+  cursor: pointer; white-space: nowrap; user-select: none; position: relative;
+  border-bottom: 2px solid var(--border-color);
+}
+th:hover { background: rgba(0,212,255,0.12); }
+th .sort-icon { margin-left: 4px; font-size: 11px; opacity: 0.5; }
+th.sort-asc .sort-icon::after { content: '\25B2'; opacity: 1; color: var(--accent-cyan); }
+th.sort-desc .sort-icon::after { content: '\25BC'; opacity: 1; color: var(--accent-cyan); }
+td { padding: 10px 14px; border-bottom: 1px solid rgba(42,53,85,0.5); vertical-align: top; }
+tr:hover td { background: rgba(0,212,255,0.03); }
+td.best { color: var(--accent-green); font-weight: 600; }
+td.worst { color: var(--accent-red); font-weight: 600; }
+.tag {
+  display: inline-block; padding: 2px 8px; border-radius: 4px;
+  font-size: 11px; font-weight: 600; white-space: nowrap;
+}
+.tag-green { background: var(--accent-green-dim); color: var(--accent-green); }
+.tag-red { background: var(--accent-red-dim); color: var(--accent-red); }
+.tag-cyan { background: var(--accent-cyan-dim); color: var(--accent-cyan); }
+.tag-orange { background: var(--accent-orange-dim); color: var(--accent-orange); }
+.tag-purple { background: rgba(167,139,250,0.15); color: var(--accent-purple); }
+.tag-yellow { background: rgba(251,191,36,0.15); color: var(--accent-yellow); }
+
+/* ========== 芯片卡片 ========== */
+.chip-card { overflow: hidden; }
+.chip-card .chip-visual {
+  height: 100px; border-radius: 6px; margin-bottom: 16px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 700; color: rgba(255,255,255,0.9);
+  position: relative; overflow: hidden;
+}
+.chip-card .chip-visual::after {
+  content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+  background: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.03) 10px, rgba(255,255,255,0.03) 20px);
+}
+.chip-card h4 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+.chip-card .chip-vendor { font-size: 12px; color: var(--text-muted); margin-bottom: 12px; }
+.chip-card .chip-params { list-style: none; margin-bottom: 16px; }
+.chip-card .chip-params li { padding: 4px 0; font-size: 13px; display: flex; justify-content: space-between; }
+.chip-card .chip-params li .param-label { color: var(--text-secondary); }
+.chip-props { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+.chip-prop { padding: 3px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+.chip-prop.pro { background: var(--accent-green-dim); color: var(--accent-green); }
+.chip-prop.con { background: var(--accent-red-dim); color: var(--accent-red); }
+
+/* ========== 雷达图（CSS实现） ========== */
+.radar-chart { width: 180px; height: 180px; position: relative; margin: 0 auto; }
+.radar-bg { position: absolute; inset: 0; }
+.radar-pentagon {
+  position: absolute; border: 1px solid rgba(0,212,255,0.15);
+  clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
+}
+.radar-pentagon:nth-child(1) { inset: 20%; }
+.radar-pentagon:nth-child(2) { inset: 10%; }
+.radar-pentagon:nth-child(3) { inset: 0; }
+.radar-labels { position: absolute; inset: 0; font-size: 10px; color: var(--text-secondary); }
+.radar-label { position: absolute; white-space: nowrap; }
+.radar-label:nth-child(1) { top: -4px; left: 50%; transform: translateX(-50%); }
+.radar-label:nth-child(2) { top: 32%; right: -8px; }
+.radar-label:nth-child(3) { bottom: -4px; left: 50%; transform: translateX(-50%); }
+.radar-label:nth-child(4) { bottom: 16%; left: -8px; }
+.radar-label:nth-child(5) { top: 16%; left: -8px; }
+.radar-data {
+  position: absolute; inset: 10%;
+  background: rgba(0,212,255,0.2); border: 1.5px solid var(--accent-cyan);
+}
+
+/* ========== 柱状图 ========== */
+.bar-chart { display: flex; align-items: flex-end; gap: 12px; height: 260px; padding: 20px 0 40px; position: relative; }
+.bar-chart::before {
+  content: ''; position: absolute; left: 0; right: 0; bottom: 40px;
+  border-top: 1px solid var(--border-color);
+}
+.bar-group { flex: 1; display: flex; flex-direction: column; align-items: center; min-width: 50px; }
+.bar {
+  width: 36px; border-radius: 4px 4px 0 0; transition: all 0.3s;
+  position: relative; min-height: 2px;
+}
+.bar:hover { opacity: 0.85; transform: scaleY(1.02); transform-origin: bottom; }
+.bar .bar-value {
+  position: absolute; top: -22px; left: 50%; transform: translateX(-50%);
+  font-size: 11px; font-weight: 600; white-space: nowrap;
+}
+.bar-label {
+  position: absolute; bottom: -28px; left: 50%; transform: translateX(-50%);
+  font-size: 11px; color: var(--text-secondary); white-space: nowrap;
+  text-align: center; max-width: 70px; overflow: hidden; text-overflow: ellipsis;
+}
+.bar.cyan { background: linear-gradient(to top, rgba(0,212,255,0.6), var(--accent-cyan)); }
+.bar.orange { background: linear-gradient(to top, rgba(255,140,66,0.6), var(--accent-orange)); }
+.bar.green { background: linear-gradient(to top, rgba(34,197,94,0.6), var(--accent-green)); }
+.bar.purple { background: linear-gradient(to top, rgba(167,139,250,0.6), var(--accent-purple)); }
+
+/* ========== 饼图（CSS实现） ========== */
+.pie-chart {
+  width: 280px; height: 280px; border-radius: 50%; position: relative;
+  margin: 0 auto;
+}
+.pie-legend { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 24px; }
+.pie-legend-item { display: flex; align-items: center; gap: 6px; font-size: 13px; }
+.pie-legend-dot { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+
+/* ========== 时间线 ========== */
+.timeline { position: relative; padding-left: 40px; }
+.timeline::before {
+  content: ''; position: absolute; left: 15px; top: 0; bottom: 0;
+  width: 2px; background: var(--border-color);
+}
+.timeline-item { position: relative; margin-bottom: 24px; }
+.timeline-item::before {
+  content: ''; position: absolute; left: -29px; top: 6px;
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--accent-cyan); border: 2px solid var(--bg-primary);
+}
+.timeline-item .year { font-size: 13px; color: var(--accent-cyan); font-weight: 700; margin-bottom: 4px; }
+.timeline-item .content { font-size: 13px; color: var(--text-secondary); }
+
+/* ========== 竞争力矩阵 ========== */
+.matrix-container {
+  position: relative; width: 100%; max-width: 700px; height: 450px;
+  margin: 0 auto; border: 1px solid var(--border-color); border-radius: var(--radius);
+  background: var(--bg-card);
+}
+.matrix-axis-x {
+  position: absolute; bottom: 40px; left: 60px; right: 20px;
+  border-bottom: 1px solid var(--text-muted);
+}
+.matrix-axis-y {
+  position: absolute; top: 20px; bottom: 40px; left: 60px;
+  border-left: 1px solid var(--text-muted);
+}
+.matrix-label-x { position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); font-size: 13px; color: var(--text-secondary); }
+.matrix-label-y { position: absolute; top: 50%; left: 8px; transform: translateY(-50%) rotate(-90deg); font-size: 13px; color: var(--text-secondary); white-space: nowrap; }
+.matrix-bubble {
+  position: absolute; border-radius: 50%; display: flex; align-items: center;
+  justify-content: center; font-size: 10px; font-weight: 700; color: #fff;
+  transform: translate(-50%, 50%); cursor: default; transition: all 0.2s;
+  border: 2px solid rgba(255,255,255,0.2);
+}
+.matrix-bubble:hover { transform: translate(-50%, 50%) scale(1.15); z-index: 10; }
+
+/* ========== SWOT ========== */
+.swot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.swot-card { padding: 20px; border-radius: var(--radius); }
+.swot-card h4 { font-size: 15px; font-weight: 700; margin-bottom: 10px; }
+.swot-card ul { list-style: none; font-size: 13px; }
+.swot-card ul li { padding: 3px 0; padding-left: 16px; position: relative; }
+.swot-card ul li::before { content: ''; position: absolute; left: 0; top: 10px; width: 6px; height: 6px; border-radius: 50%; }
+.swot-s { background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.2); }
+.swot-s h4 { color: var(--accent-green); }
+.swot-s ul li::before { background: var(--accent-green); }
+.swot-w { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); }
+.swot-w h4 { color: var(--accent-red); }
+.swot-w ul li::before { background: var(--accent-red); }
+.swot-o { background: rgba(0,212,255,0.08); border: 1px solid rgba(0,212,255,0.2); }
+.swot-o h4 { color: var(--accent-cyan); }
+.swot-o ul li::before { background: var(--accent-cyan); }
+.swot-t { background: rgba(255,140,66,0.08); border: 1px solid rgba(255,140,66,0.2); }
+.swot-t h4 { color: var(--accent-orange); }
+.swot-t ul li::before { background: var(--accent-orange); }
+
+/* ========== 推荐卡片 ========== */
+.recommend-card {
+  background: var(--bg-card); border: 1px solid var(--border-color);
+  border-radius: var(--radius); padding: 24px; position: relative; overflow: hidden;
+}
+.recommend-card h4 { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+.recommend-card .rc-desc { font-size: 13px; color: var(--text-secondary); margin-bottom: 12px; }
+.recommend-card .rc-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.recommend-card .rc-chip { padding: 3px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; background: var(--accent-cyan-dim); color: var(--accent-cyan); }
+
+/* ========== 价格区间图 ========== */
+.price-range-chart { display: flex; flex-direction: column; gap: 8px; }
+.price-range-row { display: flex; align-items: center; gap: 12px; }
+.price-range-label { width: 140px; font-size: 12px; color: var(--text-secondary); text-align: right; flex-shrink: 0; }
+.price-range-bar-bg { flex: 1; height: 24px; background: rgba(42,53,85,0.5); border-radius: 4px; position: relative; }
+.price-range-bar { height: 100%; border-radius: 4px; position: absolute; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; color: #fff; }
+
+/* ========== 附录 ========== */
+.glossary-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+.glossary-item { padding: 12px 16px; background: var(--bg-card); border-radius: var(--radius); border: 1px solid var(--border-color); }
+.glossary-item .term { font-weight: 700; color: var(--accent-cyan); font-size: 13px; }
+.glossary-item .def { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+
+/* ========== VoLTE矩阵 ========== */
+.volte-matrix { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+.volte-item { padding: 12px; border-radius: var(--radius); text-align: center; font-size: 13px; font-weight: 600; }
+.volte-yes { background: var(--accent-green-dim); color: var(--accent-green); border: 1px solid rgba(34,197,94,0.3); }
+.volte-no { background: var(--accent-red-dim); color: var(--accent-red); border: 1px solid rgba(239,68,68,0.3); }
+
+/* ========== 分组展示 ========== */
+.group-section { margin-bottom: 32px; }
+.group-header { padding: 12px 16px; background: rgba(0,212,255,0.06); border-left: 3px solid var(--accent-cyan); border-radius: 0 var(--radius) var(--radius) 0; margin-bottom: 12px; }
+.group-header h4 { font-size: 15px; font-weight: 700; }
+.group-header .group-desc { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+
+/* ========== 页脚 ========== */
+.footer {
+  padding: 40px 0; border-top: 1px solid var(--border-color);
+  text-align: center; font-size: 12px; color: var(--text-muted);
+}
+
+/* ========== 响应式 ========== */
+@media (max-width: 1024px) {
+  .nav-links { display: none; }
+  .nav-links.open { display: flex; flex-direction: column; position: absolute; top: var(--nav-height); left: 0; right: 0; background: rgba(10,14,26,0.98); padding: 16px; border-bottom: 1px solid var(--border-color); }
+  .nav-toggle { display: block; }
+  .swot-grid { grid-template-columns: 1fr; }
+  .bar-chart { height: 200px; }
+}
+@media (max-width: 768px) {
+  .section { padding: 48px 0; }
+  .card-grid, .card-grid-3 { grid-template-columns: 1fr; }
+  .cover h1 { font-size: 26px; }
+  .bar-chart { gap: 6px; }
+  .bar { width: 24px; }
+  .bar-label { font-size: 9px; max-width: 50px; }
+  .matrix-container { height: 350px; }
+}
+
+/* ========== 滚动条 ========== */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-primary); }
+::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* ========== 打印样式 ========== */
+@media print {
+  .navbar { position: static; }
+  .collapse-body { max-height: none !important; }
+  .cover { min-height: auto; padding: 40px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ==================== 导航栏 ==================== -->
+<nav class="navbar">
+  <div class="nav-brand">Cat.1 bis 竞品分析</div>
+  <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')" aria-label="菜单">&#9776;</button>
+  <div class="nav-links">
+    <a href="#cover">封面</a>
+    <a href="#ch1">市场概览</a>
+    <a href="#ch2">芯片对比</a>
+    <a href="#ch2-params">参数总览</a>
+    <a href="#ch2-cards">芯片卡片</a>
+    <a href="#ch2-analysis">深度分析</a>
+    <a href="#ch3">模组对比</a>
+    <a href="#ch3-params">模组参数</a>
+    <a href="#ch3-price">价格分析</a>
+    <a href="#ch4">竞争格局</a>
+    <a href="#ch5">选型建议</a>
+    <a href="#appendix">附录</a>
+  </div>
+</nav>
+
+<!-- ==================== 封面 ==================== -->
+<section class="cover" id="cover">
+  <div class="cover-content">
+    <div class="cover-badge">IoT Modem Competitive Analysis</div>
+    <h1>Cat.1 bis 芯片与模组竞品分析报告</h1>
+    <p class="subtitle">2024-2025年中国市场主流方案深度对比</p>
+    <div class="cover-meta">
+      <div class="cover-meta-item">
+        <div class="label">报告日期</div>
+        <div class="value">2025.05</div>
+      </div>
+      <div class="cover-meta-item">
+        <div class="label">覆盖芯片</div>
+        <div class="value">10款</div>
+      </div>
+      <div class="cover-meta-item">
+        <div class="label">覆盖模组</div>
+        <div class="value">14款</div>
+      </div>
+      <div class="cover-meta-item">
+        <div class="label">涉及厂商</div>
+        <div class="value">8家</div>
+      </div>
+    </div>
+    <p class="disclaimer">免责声明：本报告数据来源于公开信息、行业调研及厂商资料，仅供参考。报告中的价格、参数等数据可能随市场变化而调整，不构成任何投资或采购建议。引用请注明出处。</p>
+  </div>
+  <div class="cover-scroll"><span></span></div>
+</section>
+
+<!-- ==================== 第一章：市场概览 ==================== -->
+<section class="section" id="ch1">
+  <div class="container">
+    <div class="section-header">
+      <h2><span class="num">1</span> 市场概览</h2>
+      <p>Cat.1 bis技术标准、市场规模与竞争格局全景扫描</p>
+    </div>
+
+    <!-- 技术定义 -->
+    <div class="card" style="margin-bottom:24px;">
+      <h3 style="font-size:17px;margin-bottom:12px;color:var(--accent-cyan);">Cat.1 bis 技术定义</h3>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;">
+        <div><div style="font-size:12px;color:var(--text-muted);margin-bottom:2px;">标准来源</div><div style="font-weight:600;">3GPP Release 13</div></div>
+        <div><div style="font-size:12px;color:var(--text-muted);margin-bottom:2px;">天线配置</div><div style="font-weight:600;">1T1R（单天线接收）</div></div>
+        <div><div style="font-size:12px;color:var(--text-muted);margin-bottom:2px;">下行峰值速率</div><div style="font-weight:600;">10 Mbps (DL)</div></div>
+        <div><div style="font-size:12px;color:var(--text-muted);margin-bottom:2px;">上行峰值速率</div><div style="font-weight:600;">5 Mbps (UL)</div></div>
+        <div><div style="font-size:12px;color:var(--text-muted);margin-bottom:2px;">频段支持</div><div style="font-weight:600;">LTE FDD/TDD 全频段</div></div>
+        <div><div style="font-size:12px;color:var(--text-muted);margin-bottom:2px;">定位</div><div style="font-weight:600;">2G退网首选替代方案</div></div>
+      </div>
+    </div>
+
+    <!-- 市场数据 -->
+    <div class="card-grid" style="margin-bottom:32px;">
+      <div class="card stat-card">
+        <div class="stat-value cyan">2.201亿</div>
+        <div class="stat-label">2024年中国Cat.1 bis芯片出货量</div>
+        <div class="stat-change up">&#9650; 同比增长67.3%</div>
+      </div>
+      <div class="card stat-card">
+        <div class="stat-value orange">81%+</div>
+        <div class="stat-label">中国占全球Cat.1 bis出货比例</div>
+        <div class="stat-change up">&#9650; 全球最大单一市场</div>
+      </div>
+      <div class="card stat-card">
+        <div class="stat-value green">22.7%</div>
+        <div class="stat-label">移芯通信全球市场份额（第二）</div>
+        <div class="stat-change up">&#9650; 增速行业领先</div>
+      </div>
+      <div class="card stat-card">
+        <div class="stat-value purple">6+</div>
+        <div class="stat-label">主流芯片平台数量</div>
+        <div class="stat-change">竞争白热化</div>
+      </div>
+    </div>
+
+    <!-- 竞争格局 -->
+    <div class="collapse-panel">
+      <div class="collapse-header open" onclick="toggleCollapse(this)">
+        <h3>竞争格局总览</h3>
+        <div class="arrow"></div>
+      </div>
+      <div class="collapse-body open">
+        <div class="collapse-body-inner">
+          <div class="card-grid-3 card-grid">
+            <div class="card" style="border-left:3px solid var(--accent-cyan);">
+              <h4 style="color:var(--accent-cyan);margin-bottom:8px;">展锐 (UNISOC)</h4>
+              <div style="font-size:13px;color:var(--text-secondary);">
+                <p><strong>地位：</strong>全球Cat.1 bis芯片出货量第一</p>
+                <p><strong>代表产品：</strong>UIS8910DM、V8850</p>
+                <p><strong>优势：</strong>先发优势、运营商入库、全球认证完善</p>
+                <p><strong>份额：</strong>国内最大，全球领先</p>
+              </div>
+            </div>
+            <div class="card" style="border-left:3px solid var(--accent-orange);">
+              <h4 style="color:var(--accent-orange);margin-bottom:8px;">移芯通信</h4>
+              <div style="font-size:13px;color:var(--text-secondary);">
+                <p><strong>地位：</strong>全球第二，份额22.7%</p>
+                <p><strong>代表产品：</strong>EC618、EC716、EC718</p>
+                <p><strong>优势：</strong>极致功耗、性价比、快速迭代</p>
+                <p><strong>趋势：</strong>增速最快，份额持续扩大</p>
+              </div>
+            </div>
+            <div class="card" style="border-left:3px solid var(--accent-green);">
+              <h4 style="color:var(--accent-green);margin-bottom:8px;">ASR (翱捷科技)</h4>
+              <div style="font-size:13px;color:var(--text-secondary);">
+                <p><strong>地位：</strong>全球前三</p>
+                <p><strong>代表产品：</strong>ASR1606、ASR1603、ASR1602</p>
+                <p><strong>优势：</strong>VoLTE支持、北美认证、产品线丰富</p>
+                <p><strong>趋势：</strong>22nm制程，产品矩阵完善</p>
+              </div>
+            </div>
+            <div class="card" style="border-left:3px solid var(--accent-purple);">
+              <h4 style="color:var(--accent-purple);margin-bottom:8px;">高通 (Qualcomm)</h4>
+              <div style="font-size:13px;color:var(--text-secondary);">
+                <p><strong>地位：</strong>海外市场为主</p>
+                <p><strong>代表产品：</strong>QCX216</p>
+                <p><strong>优势：</strong>全球认证最广、品牌影响力</p>
+                <p><strong>劣势：</strong>价格较高，国内竞争力有限</p>
+              </div>
+            </div>
+            <div class="card" style="border-left:3px solid var(--accent-yellow);">
+              <h4 style="color:var(--accent-yellow);margin-bottom:8px;">芯翼信息 (XYTech)</h4>
+              <div style="font-size:13px;color:var(--text-secondary);">
+                <p><strong>地位：</strong>新进入者</p>
+                <p><strong>代表产品：</strong>XY4100</p>
+                <p><strong>优势：</strong>RISC-V架构、28nm制程、创新设计</p>
+                <p><strong>趋势：</strong>德电认证，积极拓展市场</p>
+              </div>
+            </div>
+            <div class="card" style="border-left:3px solid #f472b6;">
+              <h4 style="color:#f472b6;margin-bottom:8px;">海思 (HiSilicon)</h4>
+              <div style="font-size:13px;color:var(--text-secondary);">
+                <p><strong>地位：</strong>新进入</p>
+                <p><strong>代表产品：</strong>Balong系列（规划中）</p>
+                <p><strong>优势：</strong>华为生态、技术积累深厚</p>
+                <p><strong>趋势：</strong>值得关注，长期潜力大</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 市场趋势 -->
+    <div class="collapse-panel">
+      <div class="collapse-header" onclick="toggleCollapse(this)">
+        <h3>市场发展趋势</h3>
+        <div class="arrow"></div>
+      </div>
+      <div class="collapse-body">
+        <div class="collapse-body-inner">
+          <div class="card-grid">
+            <div class="card"><h4 style="margin-bottom:8px;">2G退网驱动</h4><p style="font-size:13px;color:var(--text-secondary);">全球2G网络加速退网，Cat.1 bis作为最优替代方案迎来爆发式增长。中国三大运营商已明确2G退网时间表。</p></div>
+            <div class="card"><h4 style="margin-bottom:8px;">价格持续下探</h4><p style="font-size:13px;color:var(--text-secondary);">模组价格从30+元降至12-15元区间，芯片裸片价格下探至8元以下，性价比持续提升。</p></div>
+            <div class="card"><h4 style="margin-bottom:8px;">功耗竞争白热化</h4><p style="font-size:13px;color:var(--text-secondary);">PSM功耗从5uA降至1uA以下，DRX功耗持续优化。移芯EC718系列以&lt;1uA PSM功耗引领行业。</p></div>
+            <div class="card"><h4 style="margin-bottom:8px;">全球拓展加速</h4><p style="font-size:13px;color:var(--text-secondary);">各芯片厂商积极获取全球认证（GCF/PTCRB/FCC/CE），拓展海外市场。高通和展锐在海外认证方面领先。</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 第二章：芯片平台对比 ==================== -->
+<section class="section" id="ch2" style="background:var(--bg-secondary);">
+  <div class="container">
+    <div class="section-header">
+      <h2><span class="num">2</span> 芯片平台对比</h2>
+      <p>10款主流Cat.1 bis芯片平台参数、性能与竞争力全方位对比</p>
+    </div>
+
+    <!-- 2.1 芯片参数总览表 -->
+    <div id="ch2-params" style="margin-bottom:48px;">
+      <h3 style="font-size:20px;font-weight:700;margin-bottom:20px;">2.1 芯片参数总览表</h3>
+      <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px;">点击表头可按该列排序。绿色标注最优值，红色标注最差值。</p>
+      <div class="table-wrapper">
+        <table id="chipTable">
+          <thead>
+            <tr>
+              <th data-type="string" onclick="sortTable('chipTable',0)">参数 <span class="sort-icon"></span></th>
+              <th data-type="string" onclick="sortTable('chipTable',1)">移芯EC618 <span class="sort-icon"></span></th>
+              <th data-type="string" onclick="sortTable('chipTable',2)">移芯EC716 <span class="sort-icon"></span></th>
+              <th data-type="string" onclick="sortTable('chipTable',3)">移芯EC718 <span class="sort-icon"></span></th>
+              <th data-type="string" onclick="sortTable('chipTable',4)">ASR1606 <span class="sort-icon"></span></th>
+              <th data-type="string" onclick="sortTable('chipTable',5)">ASR1603 <span class="sort-icon"></span></th>
+              <th data-type="string" onclick="sortTable('chipTable',6)">ASR1602 <span class="sort-icon"></span></th>
+              <th data-type="string" onclick="sortTable('chipTable',7)">展锐8910DM <span class="sort-icon"></span></th>
+              <th data-type="string" onclick="sortTable('chipTable',8)">展锐V8850 <span class="sort-icon"></span></th>
+              <th data-type="string" onclick="sortTable('chipTable',9)">高通QCX216 <span class="sort-icon"></span></th>
+              <th data-type="string" onclick="sortTable('chipTable',10)">芯翼XY4100 <span class="sort-icon"></span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>厂商</strong></td>
+              <td>移芯</td><td>移芯</td><td>移芯</td>
+              <td>ASR</td><td>ASR</td><td>ASR</td>
+              <td>展锐</td><td>展锐</td><td>高通</td><td>芯翼</td>
+            </tr>
+            <tr>
+              <td><strong>制程(nm)</strong></td>
+              <td>40</td><td>40</td><td class="best">22</td>
+              <td class="best">22</td><td class="best">22</td><td class="best">22</td>
+              <td class="worst">40</td><td>~28</td><td>未公开</td><td>28</td>
+            </tr>
+            <tr>
+              <td><strong>CPU架构</strong></td>
+              <td>Cortex-M4</td><td>Cortex-M4F</td><td>Cortex-M4F(+VPU)</td>
+              <td>Cortex-R5</td><td>Cortex-R5</td><td>Cortex-R5</td>
+              <td>Cortex-A5</td><td>ARM(未公开)</td><td>外挂AP</td><td>RISC-V E906+C906</td>
+            </tr>
+            <tr>
+              <td><strong>集成度</strong></td>
+              <td class="best">高(SoC)</td><td class="best">高(SoC)</td><td class="best">高(SoC)</td>
+              <td class="best">高(SoC)</td><td class="best">高(SoC)</td><td class="best">高(SoC)</td>
+              <td class="worst">中(需外挂)</td><td class="best">高(SoC)</td>
+              <td class="worst">低(Modem)</td><td class="best">高(SoC)</td>
+            </tr>
+            <tr>
+              <td><strong>PSM功耗(uA)</strong></td>
+              <td class="best">1.3</td><td>~1.5</td><td class="best">&lt;1</td>
+              <td class="worst">2-5</td><td class="worst">2-5</td><td class="worst">2-5</td>
+              <td>3.5</td><td>更优</td><td>未公开</td><td>未公开</td>
+            </tr>
+            <tr>
+              <td><strong>DRX功耗(uA)</strong></td>
+              <td class="best">130</td><td>~150</td><td>更优</td>
+              <td class="worst">150-300</td><td class="worst">150-300</td><td class="worst">150-300</td>
+              <td>未公开</td><td>降低15%</td><td>未公开</td><td>未公开</td>
+            </tr>
+            <tr>
+              <td><strong>VoLTE</strong></td>
+              <td class="worst"><span class="tag tag-red">不支持</span></td>
+              <td class="worst"><span class="tag tag-red">不支持</span></td>
+              <td class="best"><span class="tag tag-green">支持</span></td>
+              <td class="best"><span class="tag tag-green">支持</span></td>
+              <td class="best"><span class="tag tag-green">支持</span></td>
+              <td class="best"><span class="tag tag-green">支持</span></td>
+              <td class="best"><span class="tag tag-green">支持</span></td>
+              <td class="best"><span class="tag tag-green">支持</span></td>
+              <td class="best"><span class="tag tag-green">支持</span></td>
+              <td class="best"><span class="tag tag-green">支持</span></td>
+            </tr>
+            <tr>
+              <td><strong>GNSS</strong></td>
+              <td>外置</td><td>外置</td><td>外置</td>
+              <td>外置</td><td>外置</td><td>外置</td>
+              <td>外置</td>
+              <td class="best"><span class="tag tag-green">内置</span></td>
+              <td class="best"><span class="tag tag-green">内置</span></td>
+              <td>外置</td>
+            </tr>
+            <tr>
+              <td><strong>安全特性</strong></td>
+              <td>基础</td><td>基础</td><td>基础</td>
+              <td>基础</td><td>基础</td><td>基础</td>
+              <td>基础</td>
+              <td class="best">TrustZone+国密</td>
+              <td>硬件安全</td><td>基础</td>
+            </tr>
+            <tr>
+              <td><strong>工规温度</strong></td>
+              <td class="best"><span class="tag tag-green">支持</span></td>
+              <td class="best"><span class="tag tag-green">支持</span></td>
+              <td class="best"><span class="tag tag-green">支持</span></td>
+              <td class="best"><span class="tag tag-green">支持</span></td>
+              <td class="best"><span class="tag tag-green">支持</span></td>
+              <td class="best"><span class="tag tag-green">支持</span></td>
+              <td><span class="tag tag-yellow">部分</span></td>
+              <td class="best"><span class="tag tag-green">支持</span></td>
+              <td class="best"><span class="tag tag-green">支持</span></td>
+              <td class="best"><span class="tag tag-green">支持</span></td>
+            </tr>
+            <tr>
+              <td><strong>裸片价格(元)</strong></td>
+              <td class="best">8-12</td><td class="best">8-12</td><td>10-15</td>
+              <td>10-15</td><td>10-15</td><td class="best">8-12</td>
+              <td>10-15</td><td>12-18</td>
+              <td class="worst">较高</td><td>10-15</td>
+            </tr>
+            <tr>
+              <td><strong>量产时间</strong></td>
+              <td>2022</td><td>2022</td><td>2024</td>
+              <td>2023</td><td>2024</td><td>2024</td>
+              <td>2020</td><td>2023</td><td>2023</td><td>2024</td>
+            </tr>
+            <tr>
+              <td><strong>全球认证</strong></td>
+              <td>逐步拓展</td><td>逐步拓展</td><td>逐步拓展</td>
+              <td>北美认证</td><td>逐步拓展</td><td>逐步拓展</td>
+              <td>德电认证</td><td>运营商入库</td>
+              <td class="best">全球最广</td><td>德电认证</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 2.2 芯片详细卡片 -->
+    <div id="ch2-cards" style="margin-bottom:48px;">
+      <h3 style="font-size:20px;font-weight:700;margin-bottom:20px;">2.2 芯片平台详细卡片</h3>
+      <div class="card-grid-3 card-grid" id="chipCards">
+        <!-- 移芯EC618 -->
+        <div class="card chip-card">
+          <div class="chip-visual" style="background:linear-gradient(135deg,#0ea5e9,#06b6d4);">EC618</div>
+          <h4>移芯 EC618</h4>
+          <div class="chip-vendor">移芯通信 | 40nm | Cortex-M4</div>
+          <ul class="chip-params">
+            <li><span class="param-label">PSM功耗</span><span class="best">1.3 uA</span></li>
+            <li><span class="param-label">DRX功耗</span><span>130 uA</span></li>
+            <li><span class="param-label">VoLTE</span><span class="worst">不支持</span></li>
+            <li><span class="param-label">裸片价格</span><span>8-12元</span></li>
+            <li><span class="param-label">集成度</span><span>高(SoC)</span></li>
+          </ul>
+          <div class="chip-props">
+            <span class="chip-prop pro">超低功耗</span>
+            <span class="chip-prop pro">高性价比</span>
+            <span class="chip-prop con">无VoLTE</span>
+            <span class="chip-prop con">40nm制程</span>
+          </div>
+          <div class="radar-chart">
+            <div class="radar-bg"><div class="radar-pentagon"></div><div class="radar-pentagon"></div><div class="radar-pentagon"></div></div>
+            <div class="radar-labels"><div class="radar-label">功耗</div><div class="radar-label">性能</div><div class="radar-label">成本</div><div class="radar-label">生态</div><div class="radar-label">集成度</div></div>
+            <div class="radar-data" style="clip-path:polygon(50% 5%, 85% 40%, 75% 90%, 25% 85%, 15% 42%);"></div>
+          </div>
+        </div>
+        <!-- 移芯EC716 -->
+        <div class="card chip-card">
+          <div class="chip-visual" style="background:linear-gradient(135deg,#0284c7,#0ea5e9);">EC716</div>
+          <h4>移芯 EC716</h4>
+          <div class="chip-vendor">移芯通信 | 40nm | Cortex-M4F</div>
+          <ul class="chip-params">
+            <li><span class="param-label">PSM功耗</span><span>~1.5 uA</span></li>
+            <li><span class="param-label">DRX功耗</span><span>~150 uA</span></li>
+            <li><span class="param-label">VoLTE</span><span class="worst">不支持</span></li>
+            <li><span class="param-label">裸片价格</span><span>8-12元</span></li>
+            <li><span class="param-label">集成度</span><span>高(SoC)</span></li>
+          </ul>
+          <div class="chip-props">
+            <span class="chip-prop pro">低功耗</span>
+            <span class="chip-prop pro">高性价比</span>
+            <span class="chip-prop pro">生态丰富</span>
+            <span class="chip-prop con">无VoLTE</span>
+          </div>
+          <div class="radar-chart">
+            <div class="radar-bg"><div class="radar-pentagon"></div><div class="radar-pentagon"></div><div class="radar-pentagon"></div></div>
+            <div class="radar-labels"><div class="radar-label">功耗</div><div class="radar-label">性能</div><div class="radar-label">成本</div><div class="radar-label">生态</div><div class="radar-label">集成度</div></div>
+            <div class="radar-data" style="clip-path:polygon(50% 8%, 80% 42%, 70% 88%, 30% 82%, 18% 40%);"></div>
+          </div>
+        </div>
+        <!-- 移芯EC718 -->
+        <div class="card chip-card">
+          <div class="chip-visual" style="background:linear-gradient(135deg,#7c3aed,#a78bfa);">EC718</div>
+          <h4>移芯 EC718/EC718M</h4>
+          <div class="chip-vendor">移芯通信 | 22nm | Cortex-M4F+VPU</div>
+          <ul class="chip-params">
+            <li><span class="param-label">PSM功耗</span><span class="best">&lt;1 uA</span></li>
+            <li><span class="param-label">DRX功耗</span><span class="best">更优</span></li>
+            <li><span class="param-label">VoLTE</span><span class="best">支持</span></li>
+            <li><span class="param-label">裸片价格</span><span>10-15元</span></li>
+            <li><span class="param-label">集成度</span><span>高(SoC)</span></li>
+          </ul>
+          <div class="chip-props">
+            <span class="chip-prop pro">22nm先进制程</span>
+            <span class="chip-prop pro">VoLTE支持</span>
+            <span class="chip-prop pro">VPU加速</span>
+            <span class="chip-prop pro">极致低功耗</span>
+          </div>
+          <div class="radar-chart">
+            <div class="radar-bg"><div class="radar-pentagon"></div><div class="radar-pentagon"></div><div class="radar-pentagon"></div></div>
+            <div class="radar-labels"><div class="radar-label">功耗</div><div class="radar-label">性能</div><div class="radar-label">成本</div><div class="radar-label">生态</div><div class="radar-label">集成度</div></div>
+            <div class="radar-data" style="clip-path:polygon(50% 2%, 90% 38%, 65% 92%, 35% 80%, 12% 38%);"></div>
+          </div>
+        </div>
+        <!-- ASR1606 -->
+        <div class="card chip-card">
+          <div class="chip-visual" style="background:linear-gradient(135deg,#059669,#34d399);">ASR1606</div>
+          <h4>ASR 1606</h4>
+          <div class="chip-vendor">翱捷科技 | 22nm | Cortex-R5</div>
+          <ul class="chip-params">
+            <li><span class="param-label">PSM功耗</span><span>2-5 uA</span></li>
+            <li><span class="param-label">DRX功耗</span><span>150-300 uA</span></li>
+            <li><span class="param-label">VoLTE</span><span class="best">支持</span></li>
+            <li><span class="param-label">裸片价格</span><span>10-15元</span></li>
+            <li><span class="param-label">集成度</span><span>高(SoC)</span></li>
+          </ul>
+          <div class="chip-props">
+            <span class="chip-prop pro">VoLTE支持</span>
+            <span class="chip-prop pro">北美认证</span>
+            <span class="chip-prop pro">22nm制程</span>
+            <span class="chip-prop con">功耗偏高</span>
+          </div>
+          <div class="radar-chart">
+            <div class="radar-bg"><div class="radar-pentagon"></div><div class="radar-pentagon"></div><div class="radar-pentagon"></div></div>
+            <div class="radar-labels"><div class="radar-label">功耗</div><div class="radar-label">性能</div><div class="radar-label">成本</div><div class="radar-label">生态</div><div class="radar-label">集成度</div></div>
+            <div class="radar-data" style="clip-path:polygon(50% 25%, 75% 45%, 72% 85%, 40% 78%, 20% 45%);"></div>
+          </div>
+        </div>
+        <!-- ASR1603 -->
+        <div class="card chip-card">
+          <div class="chip-visual" style="background:linear-gradient(135deg,#047857,#10b981);">ASR1603</div>
+          <h4>ASR 1603</h4>
+          <div class="chip-vendor">翱捷科技 | 22nm | Cortex-R5</div>
+          <ul class="chip-params">
+            <li><span class="param-label">PSM功耗</span><span>2-5 uA</span></li>
+            <li><span class="param-label">DRX功耗</span><span>150-300 uA</span></li>
+            <li><span class="param-label">VoLTE</span><span class="best">支持</span></li>
+            <li><span class="param-label">裸片价格</span><span>10-15元</span></li>
+            <li><span class="param-label">集成度</span><span>高(SoC)</span></li>
+          </ul>
+          <div class="chip-props">
+            <span class="chip-prop pro">VoLTE支持</span>
+            <span class="chip-prop pro">22nm制程</span>
+            <span class="chip-prop pro">产品线丰富</span>
+            <span class="chip-prop con">功耗偏高</span>
+          </div>
+          <div class="radar-chart">
+            <div class="radar-bg"><div class="radar-pentagon"></div><div class="radar-pentagon"></div><div class="radar-pentagon"></div></div>
+            <div class="radar-labels"><div class="radar-label">功耗</div><div class="radar-label">性能</div><div class="radar-label">成本</div><div class="radar-label">生态</div><div class="radar-label">集成度</div></div>
+            <div class="radar-data" style="clip-path:polygon(50% 28%, 78% 43%, 70% 87%, 42% 80%, 22% 43%);"></div>
+          </div>
+        </div>
+        <!-- ASR1602 -->
+        <div class="card chip-card">
+          <div class="chip-visual" style="background:linear-gradient(135deg,#065f46,#059669);">ASR1602</div>
+          <h4>ASR 1602</h4>
+          <div class="chip-vendor">翱捷科技 | 22nm | Cortex-R5</div>
+          <ul class="chip-params">
+            <li><span class="param-label">PSM功耗</span><span>2-5 uA</span></li>
+            <li><span class="param-label">DRX功耗</span><span>150-300 uA</span></li>
+            <li><span class="param-label">VoLTE</span><span class="best">支持</span></li>
+            <li><span class="param-label">裸片价格</span><span class="best">8-12元</span></li>
+            <li><span class="param-label">集成度</span><span>高(SoC)</span></li>
+          </ul>
+          <div class="chip-props">
+            <span class="chip-prop pro">VoLTE支持</span>
+            <span class="chip-prop pro">低成本</span>
+            <span class="chip-prop pro">22nm制程</span>
+            <span class="chip-prop con">功耗偏高</span>
+          </div>
+          <div class="radar-chart">
+            <div class="radar-bg"><div class="radar-pentagon"></div><div class="radar-pentagon"></div><div class="radar-pentagon"></div></div>
+            <div class="radar-labels"><div class="radar-label">功耗</div><div class="radar-label">性能</div><div class="radar-label">成本</div><div class="radar-label">生态</div><div class="radar-label">集成度</div></div>
+            <div class="radar-data" style="clip-path:polygon(50% 30%, 72% 46%, 68% 84%, 38% 76%, 25% 46%);"></div>
+          </div>
+        </div>
+        <!-- 展锐UIS8910DM -->
+        <div class="card chip-card">
+          <div class="chip-visual" style="background:linear-gradient(135deg,#dc2626,#f87171);">UIS8910DM</div>
+          <h4>展锐 UIS8910DM</h4>
+          <div class="chip-vendor">展锐 | 40nm | Cortex-A5</div>
+          <ul class="chip-params">
+            <li><span class="param-label">PSM功耗</span><span>3.5 uA</span></li>
+            <li><span class="param-label">DRX功耗</span><span>未公开</span></li>
+            <li><span class="param-label">VoLTE</span><span class="best">支持</span></li>
+            <li><span class="param-label">裸片价格</span><span>10-15元</span></li>
+            <li><span class="param-label">集成度</span><span class="worst">中(需外挂)</span></li>
+          </ul>
+          <div class="chip-props">
+            <span class="chip-prop pro">先发优势</span>
+            <span class="chip-prop pro">生态最成熟</span>
+            <span class="chip-prop pro">德电认证</span>
+            <span class="chip-prop con">40nm制程</span>
+            <span class="chip-prop con">需外挂Flash</span>
+          </div>
+          <div class="radar-chart">
+            <div class="radar-bg"><div class="radar-pentagon"></div><div class="radar-pentagon"></div><div class="radar-pentagon"></div></div>
+            <div class="radar-labels"><div class="radar-label">功耗</div><div class="radar-label">性能</div><div class="radar-label">成本</div><div class="radar-label">生态</div><div class="radar-label">集成度</div></div>
+            <div class="radar-data" style="clip-path:polygon(50% 35%, 70% 48%, 68% 82%, 50% 70%, 30% 48%);"></div>
+          </div>
+        </div>
+        <!-- 展锐V8850 -->
+        <div class="card chip-card">
+          <div class="chip-visual" style="background:linear-gradient(135deg,#b91c1c,#ef4444);">V8850</div>
+          <h4>展锐 V8850</h4>
+          <div class="chip-vendor">展锐 | ~28nm | ARM SoC</div>
+          <ul class="chip-params">
+            <li><span class="param-label">PSM功耗</span><span>更优</span></li>
+            <li><span class="param-label">DRX功耗</span><span>降低15%</span></li>
+            <li><span class="param-label">VoLTE</span><span class="best">支持</span></li>
+            <li><span class="param-label">裸片价格</span><span>12-18元</span></li>
+            <li><span class="param-label">GNSS</span><span class="best">内置</span></li>
+          </ul>
+          <div class="chip-props">
+            <span class="chip-prop pro">内置GNSS</span>
+            <span class="chip-prop pro">TrustZone+国密</span>
+            <span class="chip-prop pro">运营商入库</span>
+            <span class="chip-prop con">价格偏高</span>
+          </div>
+          <div class="radar-chart">
+            <div class="radar-bg"><div class="radar-pentagon"></div><div class="radar-pentagon"></div><div class="radar-pentagon"></div></div>
+            <div class="radar-labels"><div class="radar-label">功耗</div><div class="radar-label">性能</div><div class="radar-label">成本</div><div class="radar-label">生态</div><div class="radar-label">集成度</div></div>
+            <div class="radar-data" style="clip-path:polygon(50% 15%, 88% 40%, 55% 90%, 45% 75%, 15% 42%);"></div>
+          </div>
+        </div>
+        <!-- 高通QCX216 -->
+        <div class="card chip-card">
+          <div class="chip-visual" style="background:linear-gradient(135deg,#1d4ed8,#3b82f6);">QCX216</div>
+          <h4>高通 QCX216</h4>
+          <div class="chip-vendor">高通 | 未公开 | 外挂AP</div>
+          <ul class="chip-params">
+            <li><span class="param-label">PSM功耗</span><span>未公开</span></li>
+            <li><span class="param-label">DRX功耗</span><span>未公开</span></li>
+            <li><span class="param-label">VoLTE</span><span class="best">支持</span></li>
+            <li><span class="param-label">裸片价格</span><span class="worst">较高</span></li>
+            <li><span class="param-label">GNSS</span><span class="best">内置</span></li>
+          </ul>
+          <div class="chip-props">
+            <span class="chip-prop pro">全球认证最广</span>
+            <span class="chip-prop pro">品牌影响力</span>
+            <span class="chip-prop pro">内置GNSS</span>
+            <span class="chip-prop con">价格较高</span>
+            <span class="chip-prop con">集成度低</span>
+          </div>
+          <div class="radar-chart">
+            <div class="radar-bg"><div class="radar-pentagon"></div><div class="radar-pentagon"></div><div class="radar-pentagon"></div></div>
+            <div class="radar-labels"><div class="radar-label">功耗</div><div class="radar-label">性能</div><div class="radar-label">成本</div><div class="radar-label">生态</div><div class="radar-label">集成度</div></div>
+            <div class="radar-data" style="clip-path:polygon(50% 40%, 85% 35%, 30% 85%, 55% 65%, 35% 50%);"></div>
+          </div>
+        </div>
+        <!-- 芯翼XY4100 -->
+        <div class="card chip-card">
+          <div class="chip-visual" style="background:linear-gradient(135deg,#d97706,#fbbf24);">XY4100</div>
+          <h4>芯翼 XY4100</h4>
+          <div class="chip-vendor">芯翼信息 | 28nm | RISC-V</div>
+          <ul class="chip-params">
+            <li><span class="param-label">PSM功耗</span><span>未公开</span></li>
+            <li><span class="param-label">DRX功耗</span><span>未公开</span></li>
+            <li><span class="param-label">VoLTE</span><span class="best">支持</span></li>
+            <li><span class="param-label">裸片价格</span><span>10-15元</span></li>
+            <li><span class="param-label">集成度</span><span>高(SoC)</span></li>
+          </ul>
+          <div class="chip-props">
+            <span class="chip-prop pro">RISC-V架构</span>
+            <span class="chip-prop pro">28nm制程</span>
+            <span class="chip-prop pro">硬件安全</span>
+            <span class="chip-prop con">新进入者</span>
+          </div>
+          <div class="radar-chart">
+            <div class="radar-bg"><div class="radar-pentagon"></div><div class="radar-pentagon"></div><div class="radar-pentagon"></div></div>
+            <div class="radar-labels"><div class="radar-label">功耗</div><div class="radar-label">性能</div><div class="radar-label">成本</div><div class="radar-label">生态</div><div class="radar-label">集成度</div></div>
+            <div class="radar-data" style="clip-path:polygon(50% 30%, 60% 50%, 65% 80%, 20% 70%, 18% 48%);"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2.3 关键维度深度分析 -->
+    <div id="ch2-analysis">
+      <h3 style="font-size:20px;font-weight:700;margin-bottom:20px;">2.3 关键维度深度分析</h3>
+
+      <!-- 功耗对比 -->
+      <div class="collapse-panel" style="margin-bottom:16px;">
+        <div class="collapse-header open" onclick="toggleCollapse(this)">
+          <h3>PSM 功耗对比 (uA)</h3>
+          <div class="arrow"></div>
+        </div>
+        <div class="collapse-body open">
+          <div class="collapse-body-inner">
+            <div class="bar-chart" id="psmChart"></div>
+            <p style="font-size:12px;color:var(--text-muted);margin-top:8px;text-align:center;">注：展锐V8850、高通QCX216、芯翼XY4100的PSM功耗未公开具体数值，未列入对比</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- DRX功耗对比 -->
+      <div class="collapse-panel" style="margin-bottom:16px;">
+        <div class="collapse-header" onclick="toggleCollapse(this)">
+          <h3>DRX 功耗对比 (uA)</h3>
+          <div class="arrow"></div>
+        </div>
+        <div class="collapse-body">
+          <div class="collapse-body-inner">
+            <div class="bar-chart" id="drxChart"></div>
+            <p style="font-size:12px;color:var(--text-muted);margin-top:8px;text-align:center;">注：展锐8910DM、高通QCX216、芯翼XY4100的DRX功耗未公开具体数值，未列入对比</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 制程演进时间线 -->
+      <div class="collapse-panel" style="margin-bottom:16px;">
+        <div class="collapse-header" onclick="toggleCollapse(this)">
+          <h3>制程演进路线</h3>
+          <div class="arrow"></div>
+        </div>
+        <div class="collapse-body">
+          <div class="collapse-body-inner">
+            <div class="timeline">
+              <div class="timeline-item">
+                <div class="year">2020</div>
+                <div class="content"><strong>展锐 UIS8910DM</strong> — 40nm制程，Cat.1 bis市场开拓者，率先量产</div>
+              </div>
+              <div class="timeline-item">
+                <div class="year">2022</div>
+                <div class="content"><strong>移芯 EC618 / EC716</strong> — 40nm制程，以极致功耗和性价比切入市场</div>
+              </div>
+              <div class="timeline-item">
+                <div class="year">2023</div>
+                <div class="content"><strong>ASR1606 / 展锐V8850 / 高通QCX216</strong> — ASR和展锐升级至22nm/~28nm，高通入局</div>
+              </div>
+              <div class="timeline-item">
+                <div class="year">2024</div>
+                <div class="content"><strong>移芯EC718 / ASR1603/1602 / 芯翼XY4100</strong> — 全面进入22nm/28nm时代，竞争白热化</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 成本分析 -->
+      <div class="collapse-panel" style="margin-bottom:16px;">
+        <div class="collapse-header" onclick="toggleCollapse(this)">
+          <h3>裸片价格对比 (元)</h3>
+          <div class="arrow"></div>
+        </div>
+        <div class="collapse-body">
+          <div class="collapse-body-inner">
+            <div class="bar-chart" id="priceChart"></div>
+            <p style="font-size:12px;color:var(--text-muted);margin-top:8px;text-align:center;">注：价格为区间中值估算，高通QCX216价格未公开，以"较高"标注</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- VoLTE能力矩阵 -->
+      <div class="collapse-panel" style="margin-bottom:16px;">
+        <div class="collapse-header" onclick="toggleCollapse(this)">
+          <h3>VoLTE 能力矩阵</h3>
+          <div class="arrow"></div>
+        </div>
+        <div class="collapse-body">
+          <div class="collapse-body-inner">
+            <div class="volte-matrix">
+              <div class="volte-item volte-no">移芯 EC618<br><small>不支持</small></div>
+              <div class="volte-item volte-no">移芯 EC716<br><small>不支持</small></div>
+              <div class="volte-item volte-yes">移芯 EC718<br><small>支持</small></div>
+              <div class="volte-item volte-yes">ASR 1606<br><small>支持</small></div>
+              <div class="volte-item volte-yes">ASR 1603<br><small>支持</small></div>
+              <div class="volte-item volte-yes">ASR 1602<br><small>支持</small></div>
+              <div class="volte-item volte-yes">展锐 8910DM<br><small>支持</small></div>
+              <div class="volte-item volte-yes">展锐 V8850<br><small>支持</small></div>
+              <div class="volte-item volte-yes">高通 QCX216<br><small>支持</small></div>
+              <div class="volte-item volte-yes">芯翼 XY4100<br><small>支持</small></div>
+            </div>
+            <p style="font-size:13px;color:var(--text-secondary);margin-top:16px;">分析：移芯EC618/EC716不支持VoLTE，主要面向纯数据传输场景。移芯EC718已补齐VoLTE能力，新一代产品全面支持语音功能。ASR和展锐全系支持VoLTE。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 第三章：模组产品对比 ==================== -->
+<section class="section" id="ch3">
+  <div class="container">
+    <div class="section-header">
+      <h2><span class="num">3</span> 模组产品对比</h2>
+      <p>14款主流Cat.1 bis模组参数、价格与应用场景全面对比</p>
+    </div>
+
+    <!-- 3.1 模组参数总览表 -->
+    <div id="ch3-params" style="margin-bottom:48px;">
+      <h3 style="font-size:20px;font-weight:700;margin-bottom:20px;">3.1 模组参数总览表</h3>
+      <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px;">点击表头可按该列排序。绿色标注最优值，红色标注最差值。</p>
+      <div class="table-wrapper">
+        <table id="moduleTable">
+          <thead>
+            <tr>
+              <th data-type="string" onclick="sortTable('moduleTable',0)">厂商 <span class="sort-icon"></span></th>
+              <th data-type="string" onclick="sortTable('moduleTable',1)">型号 <span class="sort-icon"></span></th>
+              <th data-type="string" onclick="sortTable('moduleTable',2)">芯片平台 <span class="sort-icon"></span></th>
+              <th data-type="string" onclick="sortTable('moduleTable',3)">尺寸(mm) <span class="sort-icon"></span></th>
+              <th data-type="string" onclick="sortTable('moduleTable',4)">封装 <span class="sort-icon"></span></th>
+              <th data-type="string" onclick="sortTable('moduleTable',5)">GNSS <span class="sort-icon"></span></th>
+              <th data-type="string" onclick="sortTable('moduleTable',6)">VoLTE <span class="sort-icon"></span></th>
+              <th data-type="number" onclick="sortTable('moduleTable',7)">参考价格(元) <span class="sort-icon"></span></th>
+              <th data-type="string" onclick="sortTable('moduleTable',8)">主要应用 <span class="sort-icon"></span></th>
+              <th data-type="string" onclick="sortTable('moduleTable',9)">供货状态 <span class="sort-icon"></span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>移远</td><td>EG800G-CN</td><td>移芯EC716</td><td>17.7x15.8x2.4</td><td>LGA</td><td><span class="tag tag-green">支持</span></td><td><span class="tag tag-green">支持</span></td><td>~14.5</td><td>追踪器/POS/ETC</td><td><span class="tag tag-green">量产</span></td></tr>
+            <tr><td>移远</td><td>EC800M-CN</td><td>ASR1606</td><td>17.7x15.8x2.4</td><td>LCC</td><td><span class="tag tag-cyan">可选</span></td><td><span class="tag tag-green">支持</span></td><td>~13.5-18.8</td><td>云喇叭/Tracker</td><td><span class="tag tag-green">量产</span></td></tr>
+            <tr><td>移远</td><td>EC800E-CN</td><td>移芯EC716</td><td>17.7x15.8x2.4</td><td>LCC+LGA</td><td><span class="tag tag-cyan">可选</span></td><td><span class="tag tag-green">支持</span></td><td>~13.5-14.9</td><td>共享设备/表计</td><td><span class="tag tag-green">量产</span></td></tr>
+            <tr><td>移远</td><td>EC801E-CN</td><td>移芯EC716</td><td>兼容EC800E</td><td>LCC+LGA</td><td><span class="tag tag-cyan">可选</span></td><td><span class="tag tag-green">支持</span></td><td>~13.5-14.9</td><td>工业路由器</td><td><span class="tag tag-green">量产</span></td></tr>
+            <tr><td>移远</td><td>EG800Z-CN</td><td>移芯EC718P_M</td><td>17.7x15.8x2.4</td><td>LGA</td><td><span class="tag tag-green">支持</span></td><td><span class="tag tag-green">支持</span></td><td>~15-18</td><td>新一代主力</td><td><span class="tag tag-green">量产</span></td></tr>
+            <tr><td>移远</td><td>EC800Z-CN</td><td>移芯EC718</td><td>17.7x15.8x2.4</td><td>LCC+LGA</td><td><span class="tag tag-green">支持</span></td><td><span class="tag tag-green">支持</span></td><td>~15-18</td><td>新一代主力</td><td><span class="tag tag-green">量产</span></td></tr>
+            <tr><td>广和通</td><td>LE270-CN</td><td>移芯EC718</td><td>17.7x15.8x2.4</td><td>LCC+LGA</td><td><span class="tag tag-cyan">可选</span></td><td><span class="tag tag-green">支持</span></td><td>~15-20</td><td>安防/共享/表计</td><td><span class="tag tag-green">量产</span></td></tr>
+            <tr><td>广和通</td><td>LE271-GL</td><td>移芯EC718</td><td>17.7x15.8</td><td>LCC+LGA</td><td><span class="tag tag-green">支持</span></td><td><span class="tag tag-green">支持</span></td><td>~20-25</td><td>全球追踪</td><td><span class="tag tag-green">量产</span></td></tr>
+            <tr><td>美格</td><td>SLM320</td><td>展锐8910DM</td><td>32x29x2.6</td><td>LCC</td><td><span class="tag tag-green">支持</span></td><td><span class="tag tag-green">支持</span></td><td>~20-30</td><td>POS/共享/对讲</td><td><span class="tag tag-green">量产</span></td></tr>
+            <tr><td>美格</td><td>SLM330</td><td>展锐平台</td><td>29x25x2.4</td><td>LCC</td><td><span class="tag tag-red">不支持</span></td><td><span class="tag tag-green">支持</span></td><td>~18-25</td><td>共享/支付/车载</td><td><span class="tag tag-green">量产</span></td></tr>
+            <tr><td>芯讯通</td><td>A7670C</td><td>ASR1606/1602</td><td>24x24</td><td>LGA+LCC</td><td><span class="tag tag-green">支持</span></td><td><span class="tag tag-green">支持</span></td><td>~20-35</td><td>医疗/安防</td><td><span class="tag tag-green">量产</span></td></tr>
+            <tr><td>有方</td><td>N58</td><td>展锐8910DM</td><td>25.5x30.5x2.5</td><td>LCC</td><td><span class="tag tag-green">支持</span></td><td><span class="tag tag-green">支持</span></td><td>~30-39</td><td>对讲/支付/追踪</td><td><span class="tag tag-green">量产</span></td></tr>
+            <tr><td>利尔达</td><td>NT26-FCN</td><td>移芯EC718</td><td>17.7x15.8x2.4</td><td>LCC</td><td><span class="tag tag-green">支持</span></td><td><span class="tag tag-green">支持</span></td><td>~12-18</td><td>POS/表计/安防</td><td><span class="tag tag-green">量产</span></td></tr>
+            <tr><td>中移物联</td><td>ML307R-DL</td><td>展锐8910DM</td><td>17.7x15.8x2.4</td><td>LCC+LGA</td><td><span class="tag tag-cyan">可选</span></td><td><span class="tag tag-green">支持</span></td><td>~19-20</td><td>POS/消防/智慧城市</td><td><span class="tag tag-green">量产</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 3.2 按芯片平台分组 -->
+    <div style="margin-bottom:48px;">
+      <h3 style="font-size:20px;font-weight:700;margin-bottom:20px;">3.2 按芯片平台分组展示</h3>
+
+      <div class="group-section">
+        <div class="group-header">
+          <h4>移芯 EC716 平台</h4>
+          <div class="group-desc">40nm制程 | Cortex-M4F | 不支持VoLTE | 主打极致性价比</div>
+        </div>
+        <div class="table-wrapper">
+          <table><thead><tr><th>厂商</th><th>型号</th><th>封装</th><th>参考价格</th><th>主要应用</th></tr></thead>
+          <tbody>
+            <tr><td>移远</td><td>EG800G-CN</td><td>LGA</td><td>~14.5元</td><td>追踪器/POS/ETC</td></tr>
+            <tr><td>移远</td><td>EC800E-CN</td><td>LCC+LGA</td><td>~13.5-14.9元</td><td>共享设备/表计</td></tr>
+            <tr><td>移远</td><td>EC801E-CN</td><td>LCC+LGA</td><td>~13.5-14.9元</td><td>工业路由器</td></tr>
+          </tbody></table>
+        </div>
+      </div>
+
+      <div class="group-section">
+        <div class="group-header">
+          <h4>移芯 EC718 平台</h4>
+          <div class="group-desc">22nm制程 | Cortex-M4F+VPU | 支持VoLTE | 新一代主力平台</div>
+        </div>
+        <div class="table-wrapper">
+          <table><thead><tr><th>厂商</th><th>型号</th><th>封装</th><th>参考价格</th><th>主要应用</th></tr></thead>
+          <tbody>
+            <tr><td>移远</td><td>EG800Z-CN</td><td>LGA</td><td>~15-18元</td><td>新一代主力</td></tr>
+            <tr><td>移远</td><td>EC800Z-CN</td><td>LCC+LGA</td><td>~15-18元</td><td>新一代主力</td></tr>
+            <tr><td>广和通</td><td>LE270-CN</td><td>LCC+LGA</td><td>~15-20元</td><td>安防/共享/表计</td></tr>
+            <tr><td>广和通</td><td>LE271-GL</td><td>LCC+LGA</td><td>~20-25元</td><td>全球追踪</td></tr>
+            <tr><td>利尔达</td><td>NT26-FCN</td><td>LCC</td><td>~12-18元</td><td>POS/表计/安防</td></tr>
+          </tbody></table>
+        </div>
+      </div>
+
+      <div class="group-section">
+        <div class="group-header">
+          <h4>ASR 1606 平台</h4>
+          <div class="group-desc">22nm制程 | Cortex-R5 | 支持VoLTE | 北美认证</div>
+        </div>
+        <div class="table-wrapper">
+          <table><thead><tr><th>厂商</th><th>型号</th><th>封装</th><th>参考价格</th><th>主要应用</th></tr></thead>
+          <tbody>
+            <tr><td>移远</td><td>EC800M-CN</td><td>LCC</td><td>~13.5-18.8元</td><td>云喇叭/Tracker</td></tr>
+            <tr><td>芯讯通</td><td>A7670C</td><td>LGA+LCC</td><td>~20-35元</td><td>医疗/安防</td></tr>
+          </tbody></table>
+        </div>
+      </div>
+
+      <div class="group-section">
+        <div class="group-header">
+          <h4>展锐 8910DM 平台</h4>
+          <div class="group-desc">40nm制程 | Cortex-A5 | 支持VoLTE | 生态最成熟</div>
+        </div>
+        <div class="table-wrapper">
+          <table><thead><tr><th>厂商</th><th>型号</th><th>封装</th><th>参考价格</th><th>主要应用</th></tr></thead>
+          <tbody>
+            <tr><td>美格</td><td>SLM320</td><td>LCC</td><td>~20-30元</td><td>POS/共享/对讲</td></tr>
+            <tr><td>有方</td><td>N58</td><td>LCC</td><td>~30-39元</td><td>对讲/支付/追踪</td></tr>
+            <tr><td>中移物联</td><td>ML307R-DL</td><td>LCC+LGA</td><td>~19-20元</td><td>POS/消防/智慧城市</td></tr>
+          </tbody></table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3.3 价格对比分析 -->
+    <div id="ch3-price">
+      <h3 style="font-size:20px;font-weight:700;margin-bottom:20px;">3.3 价格对比分析</h3>
+
+      <div class="card" style="margin-bottom:24px;">
+        <h4 style="margin-bottom:16px;">模组价格区间分布</h4>
+        <div class="price-range-chart" id="priceRangeChart"></div>
+      </div>
+
+      <div class="card" style="margin-bottom:24px;">
+        <h4 style="margin-bottom:16px;">同平台不同厂商价格对比（中值估算）</h4>
+        <div class="bar-chart" id="platformPriceChart" style="height:220px;"></div>
+      </div>
+
+      <div class="card">
+        <h4 style="margin-bottom:12px;">价格趋势分析</h4>
+        <div style="font-size:13px;color:var(--text-secondary);line-height:1.8;">
+          <p><strong style="color:var(--accent-cyan);">整体趋势：</strong>Cat.1 bis模组价格持续下探，从2022年的25-40元区间降至2024年的12-25元主流区间。</p>
+          <p><strong style="color:var(--accent-green);">最低价段（&lt;15元）：</strong>以移芯EC716/EC718平台模组为主，利尔达NT26-FCN低至12元，移远EC800E/EC801E约13.5元起。</p>
+          <p><strong style="color:var(--accent-orange);">主流价段（15-20元）：</strong>移芯EC718平台模组（移远EG800Z/EC800Z、广和通LE270-CN）占据主力位置。</p>
+          <p><strong style="color:var(--accent-purple);">高价段（&gt;20元）：</strong>展锐8910DM平台模组（有方N58约30-39元）和全球认证模组（广和通LE271-GL约20-25元）。</p>
+          <p><strong style="color:var(--accent-yellow);">展望：</strong>随着移芯EC718大规模量产和竞争加剧，预计2025年主流模组价格将进一步下探至10-15元区间。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 第四章：竞争格局分析 ==================== -->
+<section class="section" id="ch4" style="background:var(--bg-secondary);">
+  <div class="container">
+    <div class="section-header">
+      <h2><span class="num">4</span> 竞争格局分析</h2>
+      <p>芯片市场份额、模组厂商竞争力矩阵与SWOT分析</p>
+    </div>
+
+    <!-- 4.1 芯片平台市场份额 -->
+    <div style="margin-bottom:48px;">
+      <h3 style="font-size:20px;font-weight:700;margin-bottom:20px;">4.1 芯片平台市场份额（2024年中国市场估算）</h3>
+      <div class="card">
+        <div class="pie-chart" id="pieChart" style="background:conic-gradient(
+          #00d4ff 0deg 126deg,
+          #ff8c42 126deg 208deg,
+          #22c55e 208deg 288deg,
+          #a78bfa 288deg 324deg,
+          #fbbf24 324deg 342deg,
+          #f472b6 342deg 360deg
+        );">
+          <div style="position:absolute;inset:30%;background:var(--bg-card);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-direction:column;">
+            <div style="font-size:24px;font-weight:800;color:var(--accent-cyan);">2.201亿</div>
+            <div style="font-size:11px;color:var(--text-muted);">总出货量</div>
+          </div>
+        </div>
+        <div class="pie-legend">
+          <div class="pie-legend-item"><div class="pie-legend-dot" style="background:#00d4ff;"></div>展锐 ~35%</div>
+          <div class="pie-legend-item"><div class="pie-legend-dot" style="background:#ff8c42;"></div>移芯 ~22.7%</div>
+          <div class="pie-legend-item"><div class="pie-legend-dot" style="background:#22c55e;"></div>ASR ~22%</div>
+          <div class="pie-legend-item"><div class="pie-legend-dot" style="background:#a78bfa;"></div>高通 ~10%</div>
+          <div class="pie-legend-item"><div class="pie-legend-dot" style="background:#fbbf24;"></div>芯翼 ~5%</div>
+          <div class="pie-legend-item"><div class="pie-legend-dot" style="background:#f472b6;"></div>其他 ~5.3%</div>
+        </div>
+        <p style="font-size:12px;color:var(--text-muted);margin-top:16px;text-align:center;">注：份额为估算值，基于公开信息和行业调研综合判断</p>
+      </div>
+    </div>
+
+    <!-- 4.2 厂商模组竞争力矩阵 -->
+    <div style="margin-bottom:48px;">
+      <h3 style="font-size:20px;font-weight:700;margin-bottom:20px;">4.2 模组厂商竞争力矩阵</h3>
+      <div class="card">
+        <div class="matrix-container" id="matrixContainer">
+          <div class="matrix-axis-x"></div>
+          <div class="matrix-axis-y"></div>
+          <div class="matrix-label-x">产品丰富度 &#8594;</div>
+          <div class="matrix-label-y">价格竞争力 &#8594;</div>
+        </div>
+        <div class="pie-legend" style="margin-top:16px;">
+          <div class="pie-legend-item"><div class="pie-legend-dot" style="background:#00d4ff;"></div>移远</div>
+          <div class="pie-legend-item"><div class="pie-legend-dot" style="background:#ff8c42;"></div>广和通</div>
+          <div class="pie-legend-item"><div class="pie-legend-dot" style="background:#22c55e;"></div>美格</div>
+          <div class="pie-legend-item"><div class="pie-legend-dot" style="background:#a78bfa;"></div>芯讯通</div>
+          <div class="pie-legend-item"><div class="pie-legend-dot" style="background:#fbbf24;"></div>有方</div>
+          <div class="pie-legend-item"><div class="pie-legend-dot" style="background:#f472b6;"></div>利尔达</div>
+          <div class="pie-legend-item"><div class="pie-legend-dot" style="background:#60a5fa;"></div>中移物联</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4.3 SWOT分析 -->
+    <div>
+      <h3 style="font-size:20px;font-weight:700;margin-bottom:20px;">4.3 主要芯片平台 SWOT 分析</h3>
+
+      <!-- 移芯EC718 -->
+      <div class="collapse-panel" style="margin-bottom:16px;">
+        <div class="collapse-header open" onclick="toggleCollapse(this)">
+          <h3>移芯 EC718 平台</h3>
+          <div class="arrow"></div>
+        </div>
+        <div class="collapse-body open">
+          <div class="collapse-body-inner">
+            <div class="swot-grid">
+              <div class="swot-card swot-s"><h4>优势 (Strengths)</h4><ul>
+                <li>22nm先进制程，功耗行业领先</li><li>PSM功耗&lt;1uA，DRX功耗最优</li>
+                <li>新增VoLTE支持，补齐语音短板</li><li>VPU视频处理单元，增强多媒体能力</li><li>裸片价格10-15元，性价比突出</li>
+              </ul></div>
+              <div class="swot-card swot-w"><h4>劣势 (Weaknesses)</h4><ul>
+                <li>2024年才量产，市场验证时间短</li><li>全球认证仍在逐步拓展中</li>
+                <li>GNSS仍需外置</li><li>安全特性为基础级别</li>
+              </ul></div>
+              <div class="swot-card swot-o"><h4>机会 (Opportunities)</h4><ul>
+                <li>2G退网带来巨大替代需求</li><li>共享经济、智能表计等场景快速增长</li>
+                <li>模组厂商广泛采用（移远/广和通/利尔达）</li><li>全球市场拓展潜力大</li>
+              </ul></div>
+              <div class="swot-card swot-t"><h4>威胁 (Threats)</h4><ul>
+                <li>ASR和展锐产品线竞争激烈</li><li>价格战压缩利润空间</li>
+                <li>技术迭代加速，产品生命周期缩短</li><li>海外市场认证壁垒高</li>
+              </ul></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ASR1606 -->
+      <div class="collapse-panel" style="margin-bottom:16px;">
+        <div class="collapse-header" onclick="toggleCollapse(this)">
+          <h3>ASR 1606 平台</h3>
+          <div class="arrow"></div>
+        </div>
+        <div class="collapse-body">
+          <div class="collapse-body-inner">
+            <div class="swot-grid">
+              <div class="swot-card swot-s"><h4>优势 (Strengths)</h4><ul>
+                <li>22nm制程，性能与功耗平衡</li><li>全系支持VoLTE，语音能力强</li>
+                <li>北美认证，海外市场准入</li><li>Cortex-R5架构，实时性好</li>
+              </ul></div>
+              <div class="swot-card swot-w"><h4>劣势 (Weaknesses)</h4><ul>
+                <li>PSM功耗2-5uA，高于移芯</li><li>DRX功耗150-300uA，偏高</li>
+                <li>GNSS需外置</li><li>安全特性为基础级别</li>
+              </ul></div>
+              <div class="swot-card swot-o"><h4>机会 (Opportunities)</h4><ul>
+                <li>北美市场拓展机会</li><li>POS支付、对讲等语音场景需求增长</li><li>产品线丰富（1603/1602覆盖不同价位）</li>
+              </ul></div>
+              <div class="swot-card swot-t"><h4>威胁 (Threats)</h4><ul>
+                <li>移芯EC718在功耗方面超越</li><li>展锐V8850内置GNSS构成差异化竞争</li><li>国内价格竞争激烈</li>
+              </ul></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 展锐V8850 -->
+      <div class="collapse-panel" style="margin-bottom:16px;">
+        <div class="collapse-header" onclick="toggleCollapse(this)">
+          <h3>展锐 V8850 平台</h3>
+          <div class="arrow"></div>
+        </div>
+        <div class="collapse-body">
+          <div class="collapse-body-inner">
+            <div class="swot-grid">
+              <div class="swot-card swot-s"><h4>优势 (Strengths)</h4><ul>
+                <li>内置GNSS，追踪定位场景最优</li><li>TrustZone+国密，安全能力最强</li>
+                <li>运营商入库，渠道优势明显</li><li>展锐品牌和生态积累深厚</li>
+              </ul></div>
+              <div class="swot-card swot-w"><h4>劣势 (Weaknesses)</h4><ul>
+                <li>裸片价格12-18元，偏高</li><li>~28nm制程，非最先进</li><li>功耗数据不够透明</li>
+              </ul></div>
+              <div class="swot-card swot-o"><h4>机会 (Opportunities)</h4><ul>
+                <li>追踪定位市场快速增长</li><li>高安全需求场景（金融/政务）</li><li>海外市场运营商渠道优势</li>
+              </ul></div>
+              <div class="swot-card swot-t"><h4>威胁 (Threats)</h4><ul>
+                <li>移芯EC718在价格和功耗上竞争</li><li>高通在海外市场的品牌优势</li><li>价格下行压力</li>
+              </ul></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 展锐8910DM -->
+      <div class="collapse-panel" style="margin-bottom:16px;">
+        <div class="collapse-header" onclick="toggleCollapse(this)">
+          <h3>展锐 UIS8910DM 平台</h3>
+          <div class="arrow"></div>
+        </div>
+        <div class="collapse-body">
+          <div class="collapse-body-inner">
+            <div class="swot-grid">
+              <div class="swot-card swot-s"><h4>优势 (Strengths)</h4><ul>
+                <li>先发优势，市场验证最充分</li><li>生态最成熟，软件支持完善</li>
+                <li>德电认证，海外市场认可度高</li><li>2020年量产，稳定性经过长期验证</li>
+              </ul></div>
+              <div class="swot-card swot-w"><h4>劣势 (Weaknesses)</h4><ul>
+                <li>40nm制程，落后于竞品</li><li>需外挂Flash，集成度低</li>
+                <li>PSM功耗3.5uA，高于移芯</li><li>工规温度仅部分支持</li>
+              </ul></div>
+              <div class="swot-card swot-o"><h4>机会 (Opportunities)</h4><ul>
+                <li>存量客户维护和升级</li><li>对讲/POS等成熟场景持续需求</li><li>向V8850平滑升级</li>
+              </ul></div>
+              <div class="swot-card swot-t"><h4>威胁 (Threats)</h4><ul>
+                <li>竞品22nm平台全面超越</li><li>价格竞争力下降</li><li>客户向新平台迁移</li>
+              </ul></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 第五章：选型建议 ==================== -->
+<section class="section" id="ch5">
+  <div class="container">
+    <div class="section-header">
+      <h2><span class="num">5</span> 选型建议</h2>
+      <p>按应用场景和预算提供芯片/模组选型推荐</p>
+    </div>
+
+    <!-- 5.1 按应用场景 -->
+    <div style="margin-bottom:48px;">
+      <h3 style="font-size:20px;font-weight:700;margin-bottom:20px;">5.1 按应用场景推荐</h3>
+      <div class="card-grid">
+        <div class="recommend-card">
+          <div style="position:absolute;top:0;left:0;right:0;height:3px;background:#00d4ff;"></div>
+          <h4>共享经济</h4>
+          <div class="rc-desc">共享单车、共享充电宝、共享滑板车等。核心诉求：低功耗、低成本、小尺寸。</div>
+          <div class="rc-chips"><span class="rc-chip">移芯EC718</span><span class="rc-chip">移远EC800Z-CN</span><span class="rc-chip">利尔达NT26-FCN</span></div>
+          <p style="font-size:12px;color:var(--text-muted);margin-top:10px;">推荐理由：EC718平台22nm低功耗+VoLTE+高性价比，完美匹配共享设备长续航需求。</p>
+        </div>
+        <div class="recommend-card">
+          <div style="position:absolute;top:0;left:0;right:0;height:3px;background:#22c55e;"></div>
+          <h4>智能表计</h4>
+          <div class="rc-desc">水表、气表、电表等。核心诉求：超低功耗、宽电压、长生命周期。</div>
+          <div class="rc-chips"><span class="rc-chip">移芯EC718</span><span class="rc-chip">移远EC800Z-CN</span><span class="rc-chip">广和通LE270-CN</span></div>
+          <p style="font-size:12px;color:var(--text-muted);margin-top:10px;">推荐理由：EC718的PSM&lt;1uA行业最低功耗，宽压设计适合电池供电表计。</p>
+        </div>
+        <div class="recommend-card">
+          <div style="position:absolute;top:0;left:0;right:0;height:3px;background:#ff8c42;"></div>
+          <h4>POS 支付</h4>
+          <div class="rc-desc">移动POS、智能收银终端。核心诉求：VoLTE语音、交易稳定性、生态成熟。</div>
+          <div class="rc-chips"><span class="rc-chip">ASR1606</span><span class="rc-chip">展锐8910DM</span><span class="rc-chip">移远EC800M-CN</span></div>
+          <p style="font-size:12px;color:var(--text-muted);margin-top:10px;">推荐理由：ASR1606和8910DM生态成熟、VoLTE支持完善，POS场景经过大量验证。</p>
+        </div>
+        <div class="recommend-card">
+          <div style="position:absolute;top:0;left:0;right:0;height:3px;background:#a78bfa;"></div>
+          <h4>追踪定位</h4>
+          <div class="rc-desc">资产追踪、宠物追踪、车辆定位。核心诉求：内置GNSS、低功耗、小尺寸。</div>
+          <div class="rc-chips"><span class="rc-chip">展锐V8850</span><span class="rc-chip">移远EG800G-CN</span><span class="rc-chip">广和通LE271-GL</span></div>
+          <p style="font-size:12px;color:var(--text-muted);margin-top:10px;">推荐理由：V8850内置GNSS减少BOM成本和PCB面积，追踪场景最优方案。</p>
+        </div>
+        <div class="recommend-card">
+          <div style="position:absolute;top:0;left:0;right:0;height:3px;background:#f472b6;"></div>
+          <h4>对讲/语音</h4>
+          <div class="rc-desc">智能对讲机、云喇叭。核心诉求：VoLTE高清语音、音频处理、低延迟。</div>
+          <div class="rc-chips"><span class="rc-chip">ASR1606</span><span class="rc-chip">展锐8910DM</span><span class="rc-chip">有方N58</span></div>
+          <p style="font-size:12px;color:var(--text-muted);margin-top:10px;">推荐理由：ASR和展锐平台VoLTE语音能力经过大量对讲场景验证，音频处理成熟。</p>
+        </div>
+        <div class="recommend-card">
+          <div style="position:absolute;top:0;left:0;right:0;height:3px;background:#fbbf24;"></div>
+          <h4>海外出海</h4>
+          <div class="rc-desc">全球追踪、海外资产监控。核心诉求：全球认证、多频段、品牌背书。</div>
+          <div class="rc-chips"><span class="rc-chip">高通QCX216</span><span class="rc-chip">展锐V8850</span><span class="rc-chip">广和通LE271-GL</span></div>
+          <p style="font-size:12px;color:var(--text-muted);margin-top:10px;">推荐理由：高通全球认证最广，展锐V8850运营商入库，广和通LE271-GL支持全球频段。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5.2 按预算 -->
+    <div>
+      <h3 style="font-size:20px;font-weight:700;margin-bottom:20px;">5.2 按预算推荐</h3>
+      <div class="card-grid">
+        <div class="card" style="border-top:3px solid var(--accent-green);">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+            <h4 style="color:var(--accent-green);">极致成本</h4>
+            <span class="tag tag-green">&lt;15元</span>
+          </div>
+          <p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">适合对价格极度敏感的大规模部署场景</p>
+          <div style="font-size:13px;">
+            <p><strong>推荐芯片：</strong>移芯EC716</p>
+            <p><strong>推荐模组：</strong>利尔达NT26-FCN(~12-18元)、移远EC800E-CN(~13.5-14.9元)、移远EG800G-CN(~14.5元)</p>
+            <p><strong>注意：</strong>EC716不支持VoLTE，仅适合纯数据传输场景</p>
+          </div>
+        </div>
+        <div class="card" style="border-top:3px solid var(--accent-cyan);">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+            <h4 style="color:var(--accent-cyan);">主流性价比</h4>
+            <span class="tag tag-cyan">15-20元</span>
+          </div>
+          <p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">适合大多数IoT场景的最佳平衡选择</p>
+          <div style="font-size:13px;">
+            <p><strong>推荐芯片：</strong>移芯EC718</p>
+            <p><strong>推荐模组：</strong>移远EC800Z-CN(~15-18元)、移远EG800Z-CN(~15-18元)、广和通LE270-CN(~15-20元)</p>
+            <p><strong>优势：</strong>22nm低功耗+VoLTE+高性价比，综合能力最强</p>
+          </div>
+        </div>
+        <div class="card" style="border-top:3px solid var(--accent-orange);">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+            <h4 style="color:var(--accent-orange);">功能丰富</h4>
+            <span class="tag tag-orange">20-30元</span>
+          </div>
+          <p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">适合需要额外功能（GNSS/安全/语音）的场景</p>
+          <div style="font-size:13px;">
+            <p><strong>推荐芯片：</strong>展锐V8850、ASR1603</p>
+            <p><strong>推荐模组：</strong>美格SLM320(~20-30元)、芯讯通A7670C(~20-35元)</p>
+            <p><strong>优势：</strong>V8850内置GNSS+国密安全，ASR1603功能全面</p>
+          </div>
+        </div>
+        <div class="card" style="border-top:3px solid var(--accent-purple);">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+            <h4 style="color:var(--accent-purple);">全球出海</h4>
+            <span class="tag tag-purple">&gt;25元</span>
+          </div>
+          <p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">适合需要全球认证和运营商入库的海外项目</p>
+          <div style="font-size:13px;">
+            <p><strong>推荐芯片：</strong>高通QCX216、展锐V8850</p>
+            <p><strong>推荐模组：</strong>广和通LE271-GL(~20-25元)、高通平台模组</p>
+            <p><strong>优势：</strong>全球认证最全，海外运营商认可度高</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 附录 ==================== -->
+<section class="section" id="appendix" style="background:var(--bg-secondary);">
+  <div class="container">
+    <div class="section-header">
+      <h2><span class="num">A</span> 附录</h2>
+      <p>数据来源、术语表与免责声明</p>
+    </div>
+
+    <div class="collapse-panel" style="margin-bottom:16px;">
+      <div class="collapse-header" onclick="toggleCollapse(this)">
+        <h3>数据来源说明</h3>
+        <div class="arrow"></div>
+      </div>
+      <div class="collapse-body">
+        <div class="collapse-body-inner">
+          <div style="font-size:13px;color:var(--text-secondary);line-height:1.8;">
+            <p>1. 芯片出货量数据：参考IoT Analytics、Counterpoint Research、芯智讯等行业研究机构公开报告</p>
+            <p>2. 芯片参数数据：来源于各芯片厂商官方Datasheet、产品手册及公开技术文档</p>
+            <p>3. 模组参数数据：来源于移远、广和通、美格、芯讯通、有方、利尔达、中移物联等模组厂商官方产品页面</p>
+            <p>4. 价格数据：基于公开报价、行业调研及渠道信息综合估算，实际价格以厂商最新报价为准</p>
+            <p>5. 市场份额数据：基于行业公开信息综合估算，仅供参考</p>
+            <p>6. 认证信息：基于各厂商公开的认证清单和GCF/PTCRB数据库</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="collapse-panel" style="margin-bottom:16px;">
+      <div class="collapse-header" onclick="toggleCollapse(this)">
+        <h3>术语表</h3>
+        <div class="arrow"></div>
+      </div>
+      <div class="collapse-body">
+        <div class="collapse-body-inner">
+          <div class="glossary-grid">
+            <div class="glossary-item"><div class="term">Cat.1 bis</div><div class="def">3GPP R13定义的LTE Category 1 bis，单天线(1T1R)版本，下行10Mbps/上行5Mbps</div></div>
+            <div class="glossary-item"><div class="term">PSM (Power Saving Mode)</div><div class="def">深度睡眠模式，终端在此模式下功耗极低(微安级)，适合低频数据上报场景</div></div>
+            <div class="glossary-item"><div class="term">DRX (Discontinuous Reception)</div><div class="def">非连续接收模式，终端周期性监听网络，平衡功耗与实时性</div></div>
+            <div class="glossary-item"><div class="term">VoLTE</div><div class="def">Voice over LTE，基于LTE网络的高清语音通话技术</div></div>
+            <div class="glossary-item"><div class="term">GNSS</div><div class="def">全球导航卫星系统，包括GPS、北斗、GLONASS、Galileo等</div></div>
+            <div class="glossary-item"><div class="term">SoC (System on Chip)</div><div class="def">系统级芯片，将处理器、基带、内存等集成在单一芯片上</div></div>
+            <div class="glossary-item"><div class="term">LGA / LCC</div><div class="def">LGA=Land Grid Array(栅格阵列封装)；LCC=Leadless Chip Carrier(无引线芯片载体)</div></div>
+            <div class="glossary-item"><div class="term">TrustZone</div><div class="def">ARM硬件安全架构，提供安全的执行环境和加密存储</div></div>
+            <div class="glossary-item"><div class="term">GCF</div><div class="def">Global Certification Forum，全球认证论坛，移动设备互操作性认证</div></div>
+            <div class="glossary-item"><div class="term">PTCRB</div><div class="def">PCS Type Certification Review Board，北美移动设备认证委员会</div></div>
+            <div class="glossary-item"><div class="term">RISC-V</div><div class="def">开源指令集架构，芯翼XY4100采用此架构，区别于传统ARM架构</div></div>
+            <div class="glossary-item"><div class="term">VPU</div><div class="def">Video Processing Unit，视频处理单元，移芯EC718集成的硬件视频加速器</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="collapse-panel">
+      <div class="collapse-header" onclick="toggleCollapse(this)">
+        <h3>免责声明</h3>
+        <div class="arrow"></div>
+      </div>
+      <div class="collapse-body">
+        <div class="collapse-body-inner">
+          <div style="font-size:13px;color:var(--text-secondary);line-height:1.8;">
+            <p>1. 本报告所有数据、分析和结论仅供参考，不构成任何投资、采购或商业决策建议。</p>
+            <p>2. 报告中引用的价格为公开信息综合估算值，实际交易价格可能因采购量、合作关系、时间等因素而不同。</p>
+            <p>3. 芯片和模组参数以各厂商官方最新发布为准，本报告可能存在信息滞后或偏差。</p>
+            <p>4. 市场份额数据为估算值，基于公开信息和行业调研综合判断，可能与实际数据存在偏差。</p>
+            <p>5. 本报告不对因使用本报告信息而导致的任何直接或间接损失承担责任。</p>
+            <p>6. 未经授权，不得将本报告用于商业用途或第三方传播。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 页脚 ==================== -->
+<footer class="footer">
+  <div class="container">
+    <p>Cat.1 bis 芯片与模组竞品分析报告 | 2025年5月</p>
+    <p style="margin-top:4px;">本报告仅供内部参考使用</p>
+  </div>
+</footer>
+
+<!-- ==================== JavaScript ==================== -->
+<script>
+/* ========== 折叠/展开功能 ========== */
+function toggleCollapse(header) {
+  header.classList.toggle('open');
+  var body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+
+/* ========== 表格排序功能 ========== */
+function sortTable(tableId, colIndex) {
+  var table = document.getElementById(tableId);
+  var thead = table.querySelector('thead');
+  var tbody = table.querySelector('tbody');
+  var rows = Array.from(tbody.querySelectorAll('tr'));
+  var th = thead.querySelectorAll('th')[colIndex];
+  var dataType = th.getAttribute('data-type') || 'string';
+
+  /* 确定排序方向 */
+  var isAsc = th.classList.contains('sort-asc');
+  thead.querySelectorAll('th').forEach(function(h) {
+    h.classList.remove('sort-asc', 'sort-desc');
+  });
+  if (isAsc) {
+    th.classList.add('sort-desc');
+  } else {
+    th.classList.add('sort-asc');
+  }
+  var ascending = !isAsc;
+
+  /* 排序 */
+  rows.sort(function(a, b) {
+    var aText = a.cells[colIndex] ? a.cells[colIndex].textContent.trim() : '';
+    var bText = b.cells[colIndex] ? b.cells[colIndex].textContent.trim() : '';
+    var aVal, bVal;
+
+    if (dataType === 'number') {
+      aVal = extractNumber(aText);
+      bVal = extractNumber(bText);
+      if (aVal === null) aVal = 9999;
+      if (bVal === null) bVal = 9999;
+      return ascending ? aVal - bVal : bVal - aVal;
+    } else {
+      return ascending ? aText.localeCompare(bText, 'zh') : bText.localeCompare(aText, 'zh');
+    }
+  });
+
+  /* 重新插入行 */
+  rows.forEach(function(row) { tbody.appendChild(row); });
+}
+
+/* 从文本中提取数字（取范围中值） */
+function extractNumber(text) {
+  text = text.replace(/^~/, '');
+  var rangeMatch = text.match(/([\d.]+)\s*[-~]\s*([\d.]+)/);
+  if (rangeMatch) {
+    return (parseFloat(rangeMatch[1]) + parseFloat(rangeMatch[2])) / 2;
+  }
+  var numMatch = text.match(/([\d.]+)/);
+  if (numMatch) {
+    return parseFloat(numMatch[1]);
+  }
+  var ltMatch = text.match(/<\s*([\d.]+)/);
+  if (ltMatch) {
+    return parseFloat(ltMatch[1]) * 0.5;
+  }
+  return null;
+}
+
+/* ========== PSM功耗柱状图 ========== */
+(function() {
+  var data = [
+    { name: 'EC718', value: 0.5, color: 'cyan' },
+    { name: 'EC618', value: 1.3, color: 'cyan' },
+    { name: 'EC716', value: 1.5, color: 'cyan' },
+    { name: '8910DM', value: 3.5, color: 'orange' },
+    { name: 'ASR1606', value: 3.5, color: 'green' },
+    { name: 'ASR1603', value: 3.5, color: 'green' },
+    { name: 'ASR1602', value: 3.5, color: 'green' }
+  ];
+  var maxVal = 5;
+  var chart = document.getElementById('psmChart');
+  data.forEach(function(d) {
+    var group = document.createElement('div');
+    group.className = 'bar-group';
+    var bar = document.createElement('div');
+    bar.className = 'bar ' + d.color;
+    var height = Math.max((d.value / maxVal) * 200, 4);
+    bar.style.height = height + 'px';
+    bar.innerHTML = '<span class="bar-value">' + d.value + ' uA</span><span class="bar-label">' + d.name + '</span>';
+    group.appendChild(bar);
+    chart.appendChild(group);
+  });
+})();
+
+/* ========== DRX功耗柱状图 ========== */
+(function() {
+  var data = [
+    { name: 'EC618', value: 130, color: 'cyan' },
+    { name: 'EC716', value: 150, color: 'cyan' },
+    { name: 'EC718', value: 120, color: 'cyan' },
+    { name: 'ASR1606', value: 225, color: 'green' },
+    { name: 'ASR1603', value: 225, color: 'green' },
+    { name: 'ASR1602', value: 225, color: 'green' }
+  ];
+  var maxVal = 300;
+  var chart = document.getElementById('drxChart');
+  data.forEach(function(d) {
+    var group = document.createElement('div');
+    group.className = 'bar-group';
+    var bar = document.createElement('div');
+    bar.className = 'bar ' + d.color;
+    var height = Math.max((d.value / maxVal) * 200, 4);
+    bar.style.height = height + 'px';
+    bar.innerHTML = '<span class="bar-value">' + d.value + ' uA</span><span class="bar-label">' + d.name + '</span>';
+    group.appendChild(bar);
+    chart.appendChild(group);
+  });
+})();
+
+/* ========== 裸片价格柱状图 ========== */
+(function() {
+  var data = [
+    { name: 'EC618', value: 10, color: 'cyan' },
+    { name: 'EC716', value: 10, color: 'cyan' },
+    { name: 'ASR1602', value: 10, color: 'green' },
+    { name: 'EC718', value: 12.5, color: 'purple' },
+    { name: 'ASR1606', value: 12.5, color: 'green' },
+    { name: 'ASR1603', value: 12.5, color: 'green' },
+    { name: '8910DM', value: 12.5, color: 'orange' },
+    { name: 'XY4100', value: 12.5, color: 'cyan' },
+    { name: 'V8850', value: 15, color: 'orange' },
+    { name: 'QCX216', value: 20, color: 'green' }
+  ];
+  var maxVal = 22;
+  var chart = document.getElementById('priceChart');
+  data.forEach(function(d) {
+    var group = document.createElement('div');
+    group.className = 'bar-group';
+    var bar = document.createElement('div');
+    bar.className = 'bar ' + d.color;
+    var height = Math.max((d.value / maxVal) * 200, 4);
+    bar.style.height = height + 'px';
+    bar.innerHTML = '<span class="bar-value">' + d.value + '元</span><span class="bar-label">' + d.name + '</span>';
+    group.appendChild(bar);
+    chart.appendChild(group);
+  });
+})();
+
+/* ========== 模组价格区间分布图 ========== */
+(function() {
+  var data = [
+    { name: '利尔达 NT26-FCN', min: 12, max: 18, color: '#22c55e' },
+    { name: '移远 EC800E-CN', min: 13.5, max: 14.9, color: '#00d4ff' },
+    { name: '移远 EC801E-CN', min: 13.5, max: 14.9, color: '#00d4ff' },
+    { name: '移远 EG800G-CN', min: 14.5, max: 14.5, color: '#00d4ff' },
+    { name: '移远 EC800Z-CN', min: 15, max: 18, color: '#a78bfa' },
+    { name: '移远 EG800Z-CN', min: 15, max: 18, color: '#a78bfa' },
+    { name: '广和通 LE270-CN', min: 15, max: 20, color: '#ff8c42' },
+    { name: '移远 EC800M-CN', min: 13.5, max: 18.8, color: '#00d4ff' },
+    { name: '中移物联 ML307R', min: 19, max: 20, color: '#60a5fa' },
+    { name: '广和通 LE271-GL', min: 20, max: 25, color: '#ff8c42' },
+    { name: '美格 SLM330', min: 18, max: 25, color: '#22c55e' },
+    { name: '美格 SLM320', min: 20, max: 30, color: '#22c55e' },
+    { name: '芯讯通 A7670C', min: 20, max: 35, color: '#a78bfa' },
+    { name: '有方 N58', min: 30, max: 39, color: '#fbbf24' }
+  ];
+  var maxPrice = 40;
+  var chart = document.getElementById('priceRangeChart');
+  data.sort(function(a, b) { return a.min - b.min; });
+  data.forEach(function(d) {
+    var row = document.createElement('div');
+    row.className = 'price-range-row';
+    var label = document.createElement('div');
+    label.className = 'price-range-label';
+    label.textContent = d.name;
+    var barBg = document.createElement('div');
+    barBg.className = 'price-range-bar-bg';
+    var bar = document.createElement('div');
+    bar.className = 'price-range-bar';
+    var left = (d.min / maxPrice) * 100;
+    var width = ((d.max - d.min) / maxPrice) * 100;
+    if (width < 2) width = 2;
+    bar.style.left = left + '%';
+    bar.style.width = width + '%';
+    bar.style.background = d.color;
+    bar.style.opacity = '0.85';
+    bar.textContent = d.min + '-' + d.max + '元';
+    barBg.appendChild(bar);
+    row.appendChild(label);
+    row.appendChild(barBg);
+    chart.appendChild(row);
+  });
+})();
+
+/* ========== 同平台价格对比柱状图 ========== */
+(function() {
+  var data = [
+    { name: '移芯EC716\n(最低)', value: 13.5, color: 'cyan' },
+    { name: '移芯EC718\n(最低)', value: 12, color: 'purple' },
+    { name: 'ASR1606\n(最低)', value: 13.5, color: 'green' },
+    { name: '展锐8910DM\n(最低)', value: 19, color: 'orange' },
+    { name: '移芯EC718\n(最高)', value: 25, color: 'purple' },
+    { name: 'ASR1606\n(最高)', value: 35, color: 'green' },
+    { name: '展锐8910DM\n(最高)', value: 39, color: 'orange' }
+  ];
+  var maxVal = 42;
+  var chart = document.getElementById('platformPriceChart');
+  data.forEach(function(d) {
+    var group = document.createElement('div');
+    group.className = 'bar-group';
+    var bar = document.createElement('div');
+    bar.className = 'bar ' + d.color;
+    var height = Math.max((d.value / maxVal) * 160, 4);
+    bar.style.height = height + 'px';
+    bar.innerHTML = '<span class="bar-value">' + d.value + '元</span><span class="bar-label">' + d.name + '</span>';
+    group.appendChild(bar);
+    chart.appendChild(group);
+  });
+})();
+
+/* ========== 竞争力矩阵气泡 ========== */
+(function() {
+  var vendors = [
+    { name: '移远', x: 85, y: 80, size: 80, color: '#00d4ff' },
+    { name: '广和通', x: 55, y: 65, size: 50, color: '#ff8c42' },
+    { name: '美格', x: 35, y: 45, size: 35, color: '#22c55e' },
+    { name: '芯讯通', x: 40, y: 35, size: 30, color: '#a78bfa' },
+    { name: '有方', x: 25, y: 25, size: 25, color: '#fbbf24' },
+    { name: '利尔达', x: 30, y: 75, size: 28, color: '#f472b6' },
+    { name: '中移物联', x: 20, y: 55, size: 35, color: '#60a5fa' }
+  ];
+  var container = document.getElementById('matrixContainer');
+  vendors.forEach(function(v) {
+    var bubble = document.createElement('div');
+    bubble.className = 'matrix-bubble';
+    bubble.style.width = v.size + 'px';
+    bubble.style.height = v.size + 'px';
+    bubble.style.background = v.color;
+    bubble.style.left = 'calc(60px + ' + v.x + '% * (100% - 80px) / 100)';
+    bubble.style.bottom = 'calc(40px + ' + v.y + '% * (100% - 60px) / 100)';
+    bubble.textContent = v.name;
+    bubble.title = v.name;
+    container.appendChild(bubble);
+  });
+})();
+
+/* ========== 导航高亮 ========== */
+(function() {
+  var sections = document.querySelectorAll('section[id], .section[id]');
+  var navLinks = document.querySelectorAll('.nav-links a');
+  function updateActiveNav() {
+    var scrollPos = window.scrollY + 100;
+    sections.forEach(function(section) {
+      var top = section.offsetTop;
+      var height = section.offsetHeight;
+      var id = section.getAttribute('id');
+      if (scrollPos >= top && scrollPos < top + height) {
+        navLinks.forEach(function(link) {
+          link.classList.remove('active');
+          if (link.getAttribute('href') === '#' + id) {
+            link.classList.add('active');
+          }
+        });
+      }
+    });
+  }
+  window.addEventListener('scroll', updateActiveNav);
+})();
+</script>
+</body>
+</html>
